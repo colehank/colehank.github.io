@@ -16,6 +16,7 @@ Run locally: python scripts/update_publications.py
 """
 from __future__ import annotations
 
+import os
 import re
 import sys
 import json
@@ -29,16 +30,26 @@ MAILTO = "guohao2045@gmail.com"      # OpenAlex "polite pool" — faster, nicer
 BIB_PATH = "_bibliography/papers.bib"
 N_SELECTED = 3                       # newest N papers flagged selected={true}
 
-# Thumbnails shown to the left of a publication. Map a DOI (lowercase, no
-# https://doi.org/ prefix) to an image filename in assets/img/publication_preview/.
-# Add a line here whenever you drop a new preview image in that folder.
+# Thumbnails shown to the left of a publication.
+#
+# By default the script fetches one automatically: it reads the publisher page's
+# `og:image` (usually the paper's first figure) and downloads it. To pin a
+# specific image instead, drop it in assets/img/publication_preview/ and map the
+# DOI (lowercase, no https://doi.org/ prefix) to its filename below — a manual
+# entry here always overrides the auto-fetched one.
 PREVIEWS = {
     "10.1038/s41597-025-05174-7": "nod_meeg.png",
 }
+PREVIEW_DIR = "assets/img/publication_preview"
+AUTO_PREVIEW = True  # set False to disable automatic og:image thumbnails
 # -----------------------------------------------------------------------------
 
 ORCID_API = f"https://pub.orcid.org/v3.0/{ORCID_ID}/works"
 OPENALEX = "https://api.openalex.org/works/doi:"
+BROWSER_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
 
 
 def _get_json(url: str, accept: str = "application/json") -> dict:
@@ -122,7 +133,66 @@ def venue(work: dict) -> tuple[str, str]:
     return clean(src.get("display_name") or ""), clean(src.get("abbreviated_title") or "")
 
 
-def format_entry(work: dict, key: str, selected: bool) -> str:
+def _extract_og_image(html: str) -> str:
+    for pat in (
+        r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']',
+        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
+        r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']',
+    ):
+        m = re.search(pat, html, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+    return ""
+
+
+def fetch_preview(work: dict, doi: str, key: str) -> str:
+    """Download the publisher's og:image as a thumbnail. Returns a filename in
+    PREVIEW_DIR, or "" if none could be fetched. Existing files are reused so the
+    weekly run doesn't churn the repo."""
+    if not AUTO_PREVIEW:
+        return ""
+    # Reuse an already-downloaded auto thumbnail for this paper, if present.
+    if os.path.isdir(PREVIEW_DIR):
+        for existing in os.listdir(PREVIEW_DIR):
+            if existing.startswith(f"{key}."):
+                return existing
+
+    landing = (work.get("primary_location") or {}).get("landing_page_url") \
+        or f"https://doi.org/{doi}"
+    try:
+        req = urllib.request.Request(landing, headers={"User-Agent": BROWSER_UA})
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            html = resp.read(1_000_000).decode("utf-8", "ignore")
+        img_url = _extract_og_image(html)
+        if not img_url:
+            return ""
+        if img_url.startswith("//"):
+            img_url = "https:" + img_url
+        ireq = urllib.request.Request(img_url, headers={"User-Agent": BROWSER_UA})
+        with urllib.request.urlopen(ireq, timeout=45) as resp:
+            ctype = resp.headers.get("Content-Type", "")
+            data = resp.read(8_000_000)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! preview fetch failed for {doi}: {exc}", file=sys.stderr)
+        return ""
+
+    ext = ".png"
+    if "jpeg" in ctype or "jpg" in ctype or img_url.lower().endswith((".jpg", ".jpeg")):
+        ext = ".jpg"
+    elif "webp" in ctype or img_url.lower().endswith(".webp"):
+        ext = ".webp"
+    if len(data) < 3000:  # too small to be a real figure (likely a spacer/logo)
+        return ""
+
+    os.makedirs(PREVIEW_DIR, exist_ok=True)
+    fname = f"{key}{ext}"
+    with open(os.path.join(PREVIEW_DIR, fname), "wb") as f:
+        f.write(data)
+    print(f"  + preview downloaded for {doi} -> {fname}")
+    return fname
+
+
+def format_entry(work: dict, key: str, selected: bool, preview: str = "") -> str:
     etype = "inproceedings" if work.get("type") == "proceedings-article" else "article"
     title = clean(work.get("title") or work.get("display_name") or "")
     authors = to_bibtex_authors(work.get("authorships") or [])
@@ -159,7 +229,6 @@ def format_entry(work: dict, key: str, selected: bool) -> str:
         lines.append(f"  html={{{landing}}},")
     if abstract:
         lines.append(f"  abstract={{{abstract}}},")
-    preview = PREVIEWS.get(doi.lower())
     if preview:
         lines.append(f"  preview={{{preview}}},")
     if selected:
@@ -188,8 +257,12 @@ def main() -> int:
 
     works.sort(key=lambda w: (w.get("publication_year") or 0), reverse=True)
     seen: set[str] = set()
-    entries = [format_entry(w, make_key(w, seen), selected=i < N_SELECTED)
-               for i, w in enumerate(works)]
+    entries = []
+    for i, w in enumerate(works):
+        key = make_key(w, seen)
+        doi = (w.get("doi") or "").replace("https://doi.org/", "").lower()
+        preview = PREVIEWS.get(doi) or fetch_preview(w, doi, key)
+        entries.append(format_entry(w, key, selected=i < N_SELECTED, preview=preview))
 
     out = "---\n---\n\n" + "\n\n".join(entries) + "\n"
     with open(BIB_PATH, "w", encoding="utf-8") as f:
