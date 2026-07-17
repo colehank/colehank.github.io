@@ -28,6 +28,13 @@ ORCID_ID = "0009-0008-5892-6961"    # Guohao Zhang
 MAILTO = "guohao2045@gmail.com"      # OpenAlex "polite pool" — faster, nicer
 BIB_PATH = "_bibliography/papers.bib"
 N_SELECTED = 3                       # newest N papers flagged selected={true}
+
+# Thumbnails shown to the left of a publication. Map a DOI (lowercase, no
+# https://doi.org/ prefix) to an image filename in assets/img/publication_preview/.
+# Add a line here whenever you drop a new preview image in that folder.
+PREVIEWS = {
+    "10.1038/s41597-025-05174-7": "nod_meeg.png",
+}
 # -----------------------------------------------------------------------------
 
 ORCID_API = f"https://pub.orcid.org/v3.0/{ORCID_ID}/works"
@@ -152,6 +159,9 @@ def format_entry(work: dict, key: str, selected: bool) -> str:
         lines.append(f"  html={{{landing}}},")
     if abstract:
         lines.append(f"  abstract={{{abstract}}},")
+    preview = PREVIEWS.get(doi.lower())
+    if preview:
+        lines.append(f"  preview={{{preview}}},")
     if selected:
         lines.append("  selected={true},")
     lines.append("}")
