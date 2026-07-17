@@ -2,3 +2,4 @@ nbconvert
 pyyaml
 rendercv[full]==2.8
 scholarly
+beautifulsoup4

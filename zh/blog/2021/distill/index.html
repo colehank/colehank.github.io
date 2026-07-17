@@ -1,0 +1,1625 @@
+html <html lang="zh-CN"> <head> <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/> <meta charset="utf-8"/> <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/> <meta content="IE=edge" http-equiv="X-UA-Compatible"/> <title> 一个 distill 风格的博客文章 | Guohao Zhang </title> <meta content="Guohao Zhang" name="author"/> <meta content="an example of a distill-style blog post and main elements" name="description"/> <meta content="Guohao Zhang, NeuroAI, agent memory, LLM, decentralized science, Beijing Normal University, MEG, EEG" name="keywords"/> <meta content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;" http-equiv="Content-Security-Policy"/> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" rel="stylesheet"/> <link defer="" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap" rel="stylesheet" type="text/css"/> <link defer="" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" id="highlight_theme_light" media="" rel="stylesheet"/> <link href="/assets/img/favicon-oyster.png?v=2851da6971651983a022beae37203b63" rel="shortcut icon"/> <link href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1" rel="stylesheet"/> <link href="https://colehank.github.io/blog/2021/distill/" rel="canonical"/> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer="" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" id="highlight_theme_dark" media="none" rel="stylesheet"/> <script>
+    initTheme();
+  </script> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" integrity="sha256-q9ba7o845pMPFU+zcAll8rv+gC+fSovKsOoNQ6cynuQ=" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" integrity="sha256-Oppd74ucMR5a5Dq96FxjEzGF7tTw2fZ/6ksAqDCM8GY=" media="screen and (prefers-color-scheme: light)" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" integrity="sha256-nyCNAiECsdDHrr/s2OQsp5l9XeY2ZJ0rMepjCT2AkBk=" media="screen and (prefers-color-scheme: dark)" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/css/diff2html.min.css" integrity="sha256-IMBK4VNZp0ivwefSn51bswdsrhk0HoMTLc2GqFHFBXg=" rel="stylesheet"/> <link crossorigin="anonymous" defer="" href="https://cdn.jsdelivr.net/npm/@planktimerr/tikzjax@1.0.8/dist/fonts.css" integrity="sha256-p+CQrhSq3dnLHELDcVBFDf4whOor3w8gzLuc/pwRLyQ=" rel="stylesheet" type="text/css"/> <link href="/assets/css/al-folio-distill.css?v=fb7196ec07cb5299d51b2cbdc69c23d7" rel="stylesheet"/> <script src="/assets/js/distillpub/template.v2.js"></script> <script src="/assets/js/distillpub/transforms.v2.js"></script> <style type="text/css">
+        .fake-img {
+  background: #bbb;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+} .fake-img p {
+  font-family: monospace;
+  color: white;
+  text-align: left;
+  margin: 12px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+      </style> </head> <body> <d-front-matter> <script async="" type="text/json">
+      {
+            "title": "a distill-style blog post",
+            "description": "an example of a distill-style blog post and main elements",
+            "published": "May 22, 2021",
+            "authors": [
+              
+              {
+                "author": "Albert Einstein",
+                "authorURL": "https://en.wikipedia.org/wiki/Albert_Einstein",
+                "affiliations": [
+                  {
+                    "name": "IAS, Princeton",
+                    "url": ""
+                  }
+                ]
+              },
+              
+              {
+                "author": "Boris Podolsky",
+                "authorURL": "https://en.wikipedia.org/wiki/Boris_Podolsky",
+                "affiliations": [
+                  {
+                    "name": "IAS, Princeton",
+                    "url": ""
+                  }
+                ]
+              },
+              
+              {
+                "author": "Nathan Rosen",
+                "authorURL": "https://en.wikipedia.org/wiki/Nathan_Rosen",
+                "affiliations": [
+                  {
+                    "name": "IAS, Princeton",
+                    "url": ""
+                  }
+                ]
+              }
+              
+            ],
+            "katex": {
+              "delimiters": [
+                {
+                  "left": "$",
+                  "right": "$",
+                  "display": false
+                },
+                {
+                  "left": "$$",
+                  "right": "$$",
+                  "display": true
+                }
+              ]
+            }
+          }
+    </script> </d-front-matter> <header> <nav class="navbar navbar-light navbar-expand-sm fixed-top" id="navbar" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/zh/"> <span class="font-weight-bold">Guohao</span> 张 </a> <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler collapsed navbar-toggler-main" data-nav-toggle="navbarNav" type="button"> <span class="sr-only">切换导航</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item"> <a class="nav-link" href="/zh/">关于 </a> </li> <li class="nav-item"> <a class="nav-link" href="/zh/publications/">出版物 </a> </li> <li class="nav-item"> <a class="nav-link" href="/zh/cv/">简历 </a> </li> <li class="nav-item"> <a class="nav-link" href="/zh/news/">新闻 </a> </li> <li class="nav-item"> <a class="nav-link" href="/zh/music/">灵感 </a> </li> <li class="nav-item"> <button aria-label="Open search" id="search-toggle" title="Search" type="button"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button aria-label="Change color theme" id="light-toggle" title="Change theme" type="button"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> <li class="nav-item"><a class="nav-link" href="/blog/2021/distill/">EN</a></li></ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="post distill"> <d-title> <h1>一个 distill 风格的博客文章</h1> <p>Distill风格博客文章及主要元素示例</p> </d-title> <d-byline></d-byline> <d-article> <d-contents> <nav class="l-text figcaption"> <h3>目录</h3> <div> <a href="#equations">公式</a> </div> <div> <a href="#citations">引用</a> </div> <div> <a href="#footnotes"> 脚注</a> </div> <div> <a href="#code-blocks">代码块</a> </div> <div> <a href="#interactive-plots">交互式图表</a> </div> <div> <a href="#mermaid">Mermaid</a> </div> <div> <a href="#diff2html">Diff2Html</a> </div> <div> <a href="#leaflet">Leaflet</a> </div> <div> <a href="#chartjs-echarts-and-vega-lite">Chartjs、Echarts 和 Vega-Lite</a> </div> <div> <a href="#tikz">TikZ</a> </div> <div> <a href="#typograms">Typograms</a> </div> <div> <a href="#layouts">布局</a> </div> <div> <a href="#other-typography">其他排版？</a> </div> </nav> </d-contents> <h2 id="equations">公式</h2> <p>此主题支持使用  渲染美观的数学公式，支持行内和显示模式。<a href="https://www.mathjax.org/" rel="external nofollow noopener" target="_blank">MathJax 3</a> 引擎。你只需要用以下内容包围你的数学表达式 <code class="language-plaintext highlighter-rouge">$$</code>，例如 <code class="language-plaintext highlighter-rouge">$$ E = mc^2 $$</code>. 如果你将其留在段落中，它将生成一个内联表达式，就像 \(E = mc^2\)。</p> <p>事实上，您也可以使用单个美元符号 <code class="language-plaintext highlighter-rouge">$</code> 创建内联公式，例如 <code class="language-plaintext highlighter-rouge">$ E = mc^2 $</code>, 它将呈现为 $ E = mc^2 $ 。这种方法在基于 TeX 的编译过程中提供了相同的效果，但在视觉上看起来比双美元符号稍微不那么粗。<code class="language-plaintext highlighter-rouge">$$</code>，使其更自然地融入周围文本。</p> <p>要使用显示模式，再次用  将表达式包围起来。<code class="language-plaintext highlighter-rouge">$$</code> 并将其作为单独的段落放置。以下是一个示例：</p> \[\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)\] <p>注意 MathJax 3 是 <a href="https://docs.mathjax.org/en/latest/upgrading/whats-new-3.0.html" rel="external nofollow noopener" target="_blank">MathJax 的一次重大重写</a> 带来了显著的加载和渲染速度提升。</p> <hr/> <h2 id="citations">引用</h2> <p>然后在文章正文中使用引用 <code class="language-plaintext highlighter-rouge">&lt;d-cite&gt;</code> 标签。关键属性是参考文献中提供的 id。关键属性可以接受多个 id，用逗号分隔。</p> <p>引用以内联形式呈现如下： <d-cite key="gregor2015draw"></d-cite> （一个在悬停时显示更多信息的数字）。如果您有附录，则会自动创建并填充参考文献。</p> <p>Distill 选择了一种数字内联引用样式，以提高引用密集文章的可读性，并且由于悬停时显示更多信息，许多较长引用的好处被消除了。然而，我们认为，如果您详细讨论某些内容并且它很好地融入了文章的流畅性，提及作者的姓氏是一种良好的风格 — 作者是人类，社区将他们与自己的作品联系起来对他们来说是很好的。</p> <hr/> <h2 id="footnotes"> 脚注</h2> <p>只需将您希望显示在脚注中的文本包裹在 <code class="language-plaintext highlighter-rouge">&lt;d-footnote&gt;</code> 标签。脚注的编号将自动生成。<d-footnote>这将成为一个可悬停的脚注。</d-footnote></p> <hr/> <h2 id="code-blocks">代码块</h2> <p>语法高亮显示提供于 <code class="language-plaintext highlighter-rouge">&lt;d-code&gt;</code> 标签。内联代码片段示例：<code class="language-plaintext highlighter-rouge">&lt;d-code language="html"&gt;let x = 10;&lt;/d-code&gt;</code>. 对于较大的代码块，添加一个 <code class="language-plaintext highlighter-rouge">block</code> 属性：</p> <d-code block="" language="javascript"> var x = 25; function(x) { return x * x; } </d-code> <p><strong>注意：</strong> <code class="language-plaintext highlighter-rouge">&lt;d-code&gt;</code> 块在暗模式下看起来不好。您可以改用标准的 Jekyll 语法高亮与 <code class="language-plaintext highlighter-rouge">highlight</code> liquid 标签。</p> <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">25</span><span class="p">；</span>
+<span class="kd">函数</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">返回</span> <span class="nx">x</span> <span class="err">\</span><span class="o">*</span> <span class="nx">x</span><span class="p">；</span>
+<span class="p">}</span></code></pre></figure> <p>您还可以在三引号中使用带有语言标签的标准 Markdown 代码块，例如：</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">）：</span>
+  <span class="k">返回</span> <span class="n">x</span>
+</code></pre></div></div> <hr/> <h2 id="interactive-plots">交互式图表</h2> <p>你可以使用 plotly + iframes 添加交互式图表<img alt=":framed_picture:" class="emoji" height="20" src="https://github.githubassets.com/images/icons/emoji/unicode/1f5bc.png" title=":framed_picture:" width="20"/></p> <div class="l-page"> <iframe frameborder="0" height="500px" scrolling="no" src="/assets/plotly/demo.html" style="border: 1px dashed grey;" width="100%"></iframe> </div> <p>图表必须单独生成并保存为 HTML 文件。要生成你上面看到的图表，可以使用以下代码片段：</p> <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">导入</span> <span class="n">pandas</span> <span class="k">作为</span> <span class="n">pd</span>
+<span class="kn">导入</span> <span class="n">plotly.express</span> <span class="k">作为</span> <span class="n">像素</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">。</span><span class="nf">read_csv</span><span class="p">(</span>
+<span class="sh">'</span><span class="s">https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv</span><span class="sh">'</span>
+<span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">像素</span><span class="p">。</span><span class="nf">density_mapbox</span><span class="p">(</span>
+<span class="n">df</span><span class="p">，</span>
+<span class="n">纬度</span><span class="o">=</span><span class="sh">'</span><span class="s">纬度</span><span class="sh">'</span><span class="p">，</span>
+<span class="n">经度</span><span class="o">=</span><span class="sh">'</span><span class="s">经度</span><span class="sh">'</span><span class="p">，</span>
+<span class="n">z</span><span class="o">=</span><span class="sh">'</span><span class="s">量级</span><span class="sh">'</span><span class="p">，</span>
+<span class="n">半径</span><span class="o">=</span><span class="mi">10</span><span class="p">，</span>
+<span class="n">居中</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">纬度</span><span class="o">=</span><span class="mi">0</span><span class="p">，</span> <span class="n">经度</span><span class="o">=</span><span class="mi">180</span><span class="p">），</span>
+<span class="n">缩放</span><span class="o">=</span><span class="mi">0</span><span class="p">，</span>
+<span class="n">mapbox_style</span><span class="o">=</span><span class="sh">"</span><span class="s">stamen-terrain</span><span class="sh">"</span><span class="p">，</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="p">。</span><span class="nf">显示</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">。</span><span class="nf">write_html</span><span class="p">(</span><span class="sh">'</span><span class="s">assets/plotly/demo.html</span><span class="sh">'</span><span class="p">)</span></code></pre></figure> <hr/> <h2 id="details-boxes">详细信息框</h2> <p>详细信息框是可折叠的框，隐藏用户的附加信息。 它们可以通过以下方式添加 <code class="language-plaintext highlighter-rouge">details</code> liquid 标签：</p> <details><summary>点击这里了解更多</summary> <p>附加细节，其中数学 \(2x - 1\) 和 <code class="language-plaintext highlighter-rouge">code</code> 正确渲染。</p> </details> <hr/> <h2 id="mermaid">Mermaid</h2> <p>此主题支持直接在 markdown 中创建图表，使用 <a href="https://mermaid.js.org/" rel="external nofollow noopener" target="_blank">Mermaid</a>. Mermaid 使用户能够渲染流程图、时序图、类图、甘特图等。只需将图表语法嵌入到 mermaid 代码块中。</p> <p>要创建甘特图，可以使用以下语法：</p> <div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">```</span><span class="nl">mermaid
+</span><span class="sb">gantt
+    dateFormat  YYYY-MM-DD
+    title 甘特图
+
+    section 部分
+    任务 A           :a1, 2025-01-01, 30d
+    任务 B           :after a1, 20d
+    任务 C           :2025-01-10, 12d</span>
+<span class="p">```</span>
+</code></pre></div></div> <p>以下是它的渲染方式：</p> <pre><code class="language-mermaid">gantt
+    dateFormat  YYYY-MM-DD
+    title A Gantt Diagram
+
+    section Section
+    Task A           :a1, 2025-01-01, 30d
+    Task B           :after a1, 20d
+    Task C           :2025-01-10, 12d
+</code></pre> <p>同样，你也可以用它来创建漂亮的类图：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```mermaid
+classDiagram
+direction LR
+    class Animal {
+        +String species
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    class Bird {
+        +String wingSpan
+        +fly()
+    }
+    class Owner {
+        +String name
+        +int age
+        +adoptAnimal(Animal animal)
+    }
+
+    Animal &lt;|-- Dog
+    Animal &lt;|-- Cat
+    Animal &lt;|-- Bird
+    Owner "1" --&gt; "0..*" Animal
+
+    Dog : +fetch()
+    Cat : +purr()
+    Bird : +sing()
+```
+</code></pre></div></div> <p>它将显示为：</p> <pre><code class="language-mermaid">classDiagram
+direction LR
+    class Animal {
+        +String species
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    class Bird {
+        +String wingSpan
+        +fly()
+    }
+    class Owner {
+        +String name
+        +int age
+        +adoptAnimal(Animal animal)
+    }
+
+    Animal &lt;|-- Dog
+    Animal &lt;|-- Cat
+    Animal &lt;|-- Bird
+    Owner "1" --&gt; "0..*" Animal
+
+    Dog : +fetch()
+    Cat : +purr()
+    Bird : +sing()
+</code></pre> <p>使用 Mermaid，你可以轻松添加清晰且动态的图表来增强你的博客内容。</p> <hr/> <h2 id="diff2html">Diff2Html</h2> <p>此主题还支持集成 <a href="https://github.com/rtfpessoa/diff2html" rel="external nofollow noopener" target="_blank">Diff2Html</a>，一个工具，可以直接在 markdown 中美观地呈现代码差异（diffs）。Diff2Html 非常适合展示代码更改，清晰地呈现新增、删除和修改内容。它非常适合代码审查、文档和教程，尤其是需要逐步突出代码更改的场景——您甚至可以一次引入多个文件的更改。</p> <div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">```</span><span class="nl">diff2html
+</span><span class="sb">diff --git a/utils/mathUtils.js b/utils/mathUtils.js
+index 3b5f3d1..c7f9b2e 100644
+--- a/utils/mathUtils.js
++++ b/utils/mathUtils.js
+@@ -1,8 +1,12 @@
+-// Basic math utilities
++// Extended math utilities with additional functions
+
+-export function calculateArea(radius) {
+-    const PI = 3.14159;
++export function calculateCircleMetrics(radius) {
++    const PI = Math.PI;
+     const area = PI * radius ** 2;
++    const circumference = 2 * PI * radius;
++
++    if (!isValidRadius(radius)) throw new Error("Invalid radius");
++
+     return { area, circumference };
+ }
+
+-export function validateRadius(radius) {
++export function isValidRadius(radius) {
+     return typeof radius === 'number' &amp;&amp; radius &gt; 0;
+ }
+
+diff --git a/main.js b/main.js
+index 5f6a9c3..b7d4e8f 100644
+--- a/main.js
++++ b/main.js
+@@ -2,9 +2,12 @@
+ import { calculateCircleMetrics } from './utils/mathUtils';
+
+-function displayCircleMetrics(radius) {
+-    const { area } = calculateCircleMetrics(radius);
++function displayCircleMetrics(radius) {
++    const { area, circumference } = calculateCircleMetrics(radius);
+     console.log(`Area: ${area}`);
++    console.log(`Circumference: ${circumference}`);
+ }
+
+-displayCircleMetrics(5);
++try {
++    displayCircleMetrics(5);
++} catch (error) {
++    console.error("Error:", error.message);
++}</span>
+<span class="p">```</span>
+</code></pre></div></div> <p>这是使用 Diff2Html 渲染时的效果：</p> <pre><code class="language-diff2html">diff --git a/utils/mathUtils.js b/utils/mathUtils.js
+index 3b5f3d1..c7f9b2e 100644
+--- a/utils/mathUtils.js
++++ b/utils/mathUtils.js
+@@ -1,8 +1,12 @@
+-// Basic math utilities
++// Extended math utilities with additional functions
+
+-export function calculateArea(radius) {
+-    const PI = 3.14159;
++export function calculateCircleMetrics(radius) {
++    const PI = Math.PI;
+     const area = PI * radius ** 2;
++    const circumference = 2 * PI * radius;
++
++    if (!isValidRadius(radius)) throw new Error("Invalid radius");
++
+     return { area, circumference };
+ }
+
+-export function validateRadius(radius) {
++export function isValidRadius(radius) {
+     return typeof radius === 'number' &amp;&amp; radius &gt; 0;
+ }
+
+diff --git a/main.js b/main.js
+index 5f6a9c3..b7d4e8f 100644
+--- a/main.js
++++ b/main.js
+@@ -2,9 +2,12 @@
+ import { calculateCircleMetrics } from './utils/mathUtils';
+
+-function displayCircleMetrics(radius) {
+-    const { area } = calculateCircleMetrics(radius);
++function displayCircleMetrics(radius) {
++    const { area, circumference } = calculateCircleMetrics(radius);
+     console.log(`Area: ${area}`);
++    console.log(`Circumference: ${circumference}`);
+ }
+
+-displayCircleMetrics(5);
++try {
++    displayCircleMetrics(5);
++} catch (error) {
++    console.error("Error:", error.message);
++}
+</code></pre> <hr/> <h2 id="leaflet">Leaflet</h2> <p><a href="https://leafletjs.com/" rel="external nofollow noopener" target="_blank">Leaflet</a> 是由乌克兰软件工程师创建的 <a href="https://agafonkin.com/" rel="external nofollow noopener" target="_blank">Volodymyr Agafonkin</a>，允许在网页中嵌入交互式地图。支持 <a href="https://geojson.org/" rel="external nofollow noopener" target="_blank"> GeoJSON 数据</a>， Leaflet 允许您突出显示特定区域，从而轻松详细地可视化地理信息。</p> <p>您可以使用以下代码在 上加载地图信息<a href="https://www.openstreetmap.org/" rel="external nofollow noopener" target="_blank">OpenStreetMap</a>：</p> <div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">```</span><span class="nl">geojson
+</span><span class="sb">{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "克里米亚",
+        "popupContent": "被占领的克里米亚"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              33.9,
+              45.3
+            ],
+            [
+              36.5,
+              45.3
+            ],
+            [
+              36.5,
+              44.4
+            ],
+            [
+              33.9,
+              44.4
+            ],
+            [
+              33.9,
+              45.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "顿涅茨克",
+        "popupContent": "被占领的顿涅茨克"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              37.5,
+              48.5
+            ],
+            [
+              39.5,
+              48.5
+            ],
+            [
+              39.5,
+              47.5
+            ],
+            [
+              37.5,
+              47.5
+            ],
+            [
+              37.5,
+              48.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "卢甘斯克",
+        "popupContent": "被占领的卢甘斯克"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              38.5,
+              49.5
+            ],
+            [
+              40.5,
+              49.5
+            ],
+            [
+              40.5,
+              48.5
+            ],
+            [
+              38.5,
+              48.5
+            ],
+            [
+              38.5,
+              49.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "赫尔松",
+        "popupContent": "被占领的赫尔松"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.3,
+              47.3
+            ],
+            [
+              34.3,
+              47.3
+            ],
+            [
+              34.3,
+              46.3
+            ],
+            [
+              32.3,
+              46.3
+            ],
+            [
+              32.3,
+              47.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "扎波罗热",
+        "popupContent": "被占领的扎波罗热"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              34.3,
+              48
+            ],
+            [
+              36.3,
+              48
+            ],
+            [
+              36.3,
+              47
+            ],
+            [
+              34.3,
+              47
+            ],
+            [
+              34.3,
+              48
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}</span>
+<span class="p">```</span>
+</code></pre></div></div> <p>下面渲染的地图突出显示了多年来被俄罗斯非法占领的乌克兰地区，包括克里米亚和四个东部地区：</p> <pre><code class="language-geojson">{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Crimea",
+        "popupContent": "Occupied Crimea"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              33.9,
+              45.3
+            ],
+            [
+              36.5,
+              45.3
+            ],
+            [
+              36.5,
+              44.4
+            ],
+            [
+              33.9,
+              44.4
+            ],
+            [
+              33.9,
+              45.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Donetsk",
+        "popupContent": "Occupied Donetsk"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              37.5,
+              48.5
+            ],
+            [
+              39.5,
+              48.5
+            ],
+            [
+              39.5,
+              47.5
+            ],
+            [
+              37.5,
+              47.5
+            ],
+            [
+              37.5,
+              48.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Luhansk",
+        "popupContent": "Occupied Luhansk"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              38.5,
+              49.5
+            ],
+            [
+              40.5,
+              49.5
+            ],
+            [
+              40.5,
+              48.5
+            ],
+            [
+              38.5,
+              48.5
+            ],
+            [
+              38.5,
+              49.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kherson",
+        "popupContent": "Occupied Kherson"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.3,
+              47.3
+            ],
+            [
+              34.3,
+              47.3
+            ],
+            [
+              34.3,
+              46.3
+            ],
+            [
+              32.3,
+              46.3
+            ],
+            [
+              32.3,
+              47.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Zaporizhzhia",
+        "popupContent": "Occupied Zaporizhzhia"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              34.3,
+              48
+            ],
+            [
+              36.3,
+              48
+            ],
+            [
+              36.3,
+              47
+            ],
+            [
+              34.3,
+              47
+            ],
+            [
+              34.3,
+              48
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
+</code></pre> <hr/> <h2 id="chartjs-echarts-and-vega-lite">Chartjs、Echarts 和 Vega-Lite</h2> <p><a href="https://www.chartjs.org/" rel="external nofollow noopener" target="_blank">Chart.js</a> 是一个多功能的 JavaScript 库，用于创建响应式和交互式图表。支持多种图表类型，如柱状图、折线图、饼图和雷达图，是直接在网页中可视化数据的理想工具。</p> <p>这是一个 JSON 风格的配置示例，用于在 Chart.js 中创建柱状图：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```chartjs
+{
+  "type": "bar",
+  "data": {
+    "labels": ["2017", "2018", "2019", "2020", "2021"],
+    "datasets": [
+      {
+        "label": "Population (millions)",
+        "data": [12, 15, 13, 14, 16],
+        "backgroundColor": "rgba(54, 162, 235, 0.6)",
+        "borderColor": "rgba(54, 162, 235, 1)",
+        "borderWidth": 1
+      }
+    ]
+  },
+  "options": {
+    "scales": {
+      "y": {
+        "beginAtZero": true
+      }
+    }
+  }
+}
+```
+</code></pre></div></div> <p>渲染的柱状图展示了2017年至2021年的人口数据：</p> <pre><code class="language-chartjs">{
+  "type": "bar",
+  "data": {
+    "labels": ["2017", "2018", "2019", "2020", "2021"],
+    "datasets": [
+      {
+        "label": "Population (millions)",
+        "data": [12, 15, 13, 14, 16],
+        "backgroundColor": "rgba(54, 162, 235, 0.6)",
+        "borderColor": "rgba(54, 162, 235, 1)",
+        "borderWidth": 1
+      }
+    ]
+  },
+  "options": {
+    "scales": {
+      "y": {
+        "beginAtZero": true
+      }
+    }
+  }
+}
+</code></pre> <hr/> <p><a href="https://echarts.apache.org/" rel="external nofollow noopener" target="_blank">ECharts</a> 是一个来自 <a href="https://www.apache.org/" rel="external nofollow noopener" target="_blank">Apache</a> 支持多种交互式图表，包括更高级的类型，如散点图、热图和地理地图。</p> <p>以下 JSON 配置创建了一个视觉增强的折线图，显示了两种产品的月度销售数据。</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```echarts
+{
+  "title": {
+    "text": "Monthly Sales Comparison",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "axis",
+    "backgroundColor": "rgba(50, 50, 50, 0.7)",
+    "borderColor": "#777",
+    "borderWidth": 1,
+    "textStyle": {
+      "color": "#fff"
+    }
+  },
+  "legend": {
+    "data": ["Product A", "Product B"],
+    "top": "10%"
+  },
+  "xAxis": {
+    "type": "category",
+    "data": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "axisLine": {
+      "lineStyle": {
+        "color": "#888"
+      }
+    }
+  },
+  "yAxis": {
+    "type": "value",
+    "axisLine": {
+      "lineStyle": {
+        "color": "#888"
+      }
+    },
+    "splitLine": {
+      "lineStyle": {
+        "type": "dashed"
+      }
+    }
+  },
+  "series": [
+    {
+      "name": "Product A",
+      "type": "line",
+      "smooth": true,
+      "data": [820, 932, 901, 934, 1290, 1330, 1320, 1400, 1450, 1500, 1600, 1650],
+      "itemStyle": {
+        "color": "#5470C6"
+      },
+      "lineStyle": {
+        "width": 3
+      },
+      "areaStyle": {
+        "color": {
+          "type": "linear",
+          "x": 0,
+          "y": 0,
+          "x2": 0,
+          "y2": 1,
+          "colorStops": [
+            { "offset": 0, "color": "rgba(84, 112, 198, 0.5)" },
+            { "offset": 1, "color": "rgba(84, 112, 198, 0)" }
+          ]
+        }
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Product B",
+      "type": "line",
+      "smooth": true,
+      "data": [620, 732, 701, 734, 1090, 1130, 1120, 1200, 1250, 1300, 1400, 1450],
+      "itemStyle": {
+        "color": "#91CC75"
+      },
+      "lineStyle": {
+        "width": 3
+      },
+      "areaStyle": {
+        "color": {
+          "type": "linear",
+          "x": 0,
+          "y": 0,
+          "x2": 0,
+          "y2": 1,
+          "colorStops": [
+            { "offset": 0, "color": "rgba(145, 204, 117, 0.5)" },
+            { "offset": 1, "color": "rgba(145, 204, 117, 0)" }
+          ]
+        }
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    }
+  ]
+}
+```
+</code></pre></div></div> <p>下面显示了渲染的输出，您还可以使用鼠标与之交互：</p> <pre><code class="language-echarts">{
+  "title": {
+    "text": "Monthly Sales Comparison",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "axis",
+    "backgroundColor": "rgba(50, 50, 50, 0.7)",
+    "borderColor": "#777",
+    "borderWidth": 1,
+    "textStyle": {
+      "color": "#fff"
+    }
+  },
+  "legend": {
+    "data": ["Product A", "Product B"],
+    "top": "10%"
+  },
+  "xAxis": {
+    "type": "category",
+    "data": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "axisLine": {
+      "lineStyle": {
+        "color": "#888"
+      }
+    }
+  },
+  "yAxis": {
+    "type": "value",
+    "axisLine": {
+      "lineStyle": {
+        "color": "#888"
+      }
+    },
+    "splitLine": {
+      "lineStyle": {
+        "type": "dashed"
+      }
+    }
+  },
+  "series": [
+    {
+      "name": "Product A",
+      "type": "line",
+      "smooth": true,
+      "data": [820, 932, 901, 934, 1290, 1330, 1320, 1400, 1450, 1500, 1600, 1650],
+      "itemStyle": {
+        "color": "#5470C6"
+      },
+      "lineStyle": {
+        "width": 3
+      },
+      "areaStyle": {
+        "color": {
+          "type": "linear",
+          "x": 0,
+          "y": 0,
+          "x2": 0,
+          "y2": 1,
+          "colorStops": [
+            { "offset": 0, "color": "rgba(84, 112, 198, 0.5)" },
+            { "offset": 1, "color": "rgba(84, 112, 198, 0)" }
+          ]
+        }
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Product B",
+      "type": "line",
+      "smooth": true,
+      "data": [620, 732, 701, 734, 1090, 1130, 1120, 1200, 1250, 1300, 1400, 1450],
+      "itemStyle": {
+        "color": "#91CC75"
+      },
+      "lineStyle": {
+        "width": 3
+      },
+      "areaStyle": {
+        "color": {
+          "type": "linear",
+          "x": 0,
+          "y": 0,
+          "x2": 0,
+          "y2": 1,
+          "colorStops": [
+            { "offset": 0, "color": "rgba(145, 204, 117, 0.5)" },
+            { "offset": 1, "color": "rgba(145, 204, 117, 0)" }
+          ]
+        }
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    }
+  ]
+}
+</code></pre> <hr/> <p><a href="https://vega.github.io/vega-lite/" rel="external nofollow noopener" target="_blank">Vega-Lite</a> 是一种声明式可视化语法，允许用户创建、共享和自定义各种交互式数据可视化。以下 JSON 配置生成了一个简单的柱状图：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```vega_lite
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 400,
+  "height": 200,
+  "padding": 5,
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {"category": "A", "value": 28},
+        {"category": "B", "value": 55},
+        {"category": "C", "value": 43},
+        {"category": "D", "value": 91},
+        {"category": "E", "value": 81},
+        {"category": "F", "value": 53},
+        {"category": "G", "value": 19},
+        {"category": "H", "value": 87}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "table", "field": "category"},
+      "range": "width",
+      "padding": 0.1
+    },
+    {
+      "name": "yscale",
+      "type": "linear",
+      "domain": {"data": "table", "field": "value"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    {"orient": "bottom", "scale": "xscale"},
+    {"orient": "left", "scale": "yscale"}
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "table"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "category"},
+          "width": {"scale": "xscale", "band": 0.8},
+          "y": {"scale": "yscale", "field": "value"},
+          "y2": {"scale": "yscale", "value": 0},
+          "fill": {"value": "steelblue"}
+        },
+        "update": {
+          "fillOpacity": {"value": 1}
+        },
+        "hover": {
+          "fill": {"value": "orange"}
+        }
+      }
+    }
+  ]
+}
+```
+</code></pre></div></div> <p>渲染的输出显示了一个干净简洁的柱状图，并带有悬停效果：</p> <pre><code class="language-vega_lite">{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 400,
+  "height": 200,
+  "padding": 5,
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {"category": "A", "value": 28},
+        {"category": "B", "value": 55},
+        {"category": "C", "value": 43},
+        {"category": "D", "value": 91},
+        {"category": "E", "value": 81},
+        {"category": "F", "value": 53},
+        {"category": "G", "value": 19},
+        {"category": "H", "value": 87}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "table", "field": "category"},
+      "range": "width",
+      "padding": 0.1
+    },
+    {
+      "name": "yscale",
+      "type": "linear",
+      "domain": {"data": "table", "field": "value"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    {"orient": "bottom", "scale": "xscale"},
+    {"orient": "left", "scale": "yscale"}
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "table"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "category"},
+          "width": {"scale": "xscale", "band": 0.8},
+          "y": {"scale": "yscale", "field": "value"},
+          "y2": {"scale": "yscale", "value": 0},
+          "fill": {"value": "steelblue"}
+        },
+        "update": {
+          "fillOpacity": {"value": 1}
+        },
+        "hover": {
+          "fill": {"value": "orange"}
+        }
+      }
+    }
+  ]
+}
+</code></pre> <hr/> <h2 id="tikz">TikZ</h2> <p><a href="https://tikz.net/" rel="external nofollow noopener" target="_blank">TikZ</a> 是一个强大的基于 LaTeX 的绘图工具，由 <a href="https://tikzjax.com/" rel="external nofollow noopener" target="_blank">TikZJax</a>. 你可以轻松地将 TikZ 绘图从论文、海报和笔记中移植过来。例如，我们可以使用以下代码来说明欧拉公式 $ e^{i \theta} = \cos \theta + i \sin \theta $：</p> <div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/tikz"</span><span class="nt">&gt;</span>
+<span class="se">\b</span>egin{document}
+  <span class="se">\b</span>egin{tikzpicture}
+      <span class="se">\f</span>illdraw[fill=cyan!10, draw=blue, thick] (0,0) circle (2cm);<span class="sb">
+
+      \draw[-&gt;, thick] (-2.5,0) -- (2.5,0) node[right] {实部};
+      \draw[-&gt;, thick] (0,-2.5) -- (0,2.5) node[above] {虚部};
+
+      \draw[-&gt;, thick, color=purple] (0,0) -- (1.5,1.5);
+      \node[color=purple] at (1.1, 1.7) {$e^{i\theta}$};
+
+      \draw[thick] (0.7,0) arc (0:45:0.7);
+      \node at (0.9, 0.3) {$\theta$};
+
+      \draw[dashed, color=gray] (1.5,1.5) -- (1.5,0) node[below, black] {$\cos \theta$};
+      \draw[dashed, color=gray] (1.5,1.5) -- (0,1.5) node[left, black] {$\sin \theta$};
+      \node at (2.2, 0) [below] {1};
+      \node at (0, 2.2) [left] {$i$};
+      \node at (1.5,1.5) [above right, color=blue] {$(\cos \theta \, \sin \theta)$};
+</span>  <span class="se">\e</span>nd{tikzpicture}
+<span class="se">\e</span>nd{document}
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div> <p>下面显示了渲染的输出，以矢量图形式展示：</p> <script type="text/tikz">
+\begin{document}
+  \begin{tikzpicture}
+      \filldraw[fill=cyan!10, draw=blue, thick] (0,0) circle (2cm);
+
+      \draw[->, thick] (-2.5,0) -- (2.5,0) node[right] {Re};
+      \draw[->, thick] (0,-2.5) -- (0,2.5) node[above] {Im};
+
+      \draw[->, thick, color=purple] (0,0) -- (1.5,1.5);
+      \node[color=purple] at (1.1, 1.7) {$e^{i\theta}$};
+
+      \draw[thick] (0.7,0) arc (0:45:0.7);
+      \node at (0.9, 0.3) {$\theta$};
+
+      \draw[dashed, color=gray] (1.5,1.5) -- (1.5,0) node[below, black] {$\cos \theta$};
+      \draw[dashed, color=gray] (1.5,1.5) -- (0,1.5) node[left, black] {$\sin \theta$};
+      \node at (2.2, 0) [below] {1};
+      \node at (0, 2.2) [left] {$i$};
+      \node at (1.5,1.5) [above right, color=blue] {$(\cos \theta \, \sin \theta)$};
+  \end{tikzpicture}
+\end{document}
+</script> <hr/> <h2 id="typograms">Typograms</h2> <p><a href="https://google.github.io/typograms/" rel="external nofollow noopener" target="_blank">Typograms</a> 是一种结合文本和图形以清晰且视觉吸引人的方式传递信息的方法。Typograms 特别适合用于说明简单的图表、图形和概念视觉效果，其中文本和图形紧密集成。以下示例展示了一个简单的 Typogram：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```typograms
+             ___________________
+            /                  /|
+           /__________________/ |
+          |                  |  |
+          |     Distill      |  |
+          |                  |  |
+          |                  | /
+          |__________________|/
+```
+</code></pre></div></div> <p>下面显示了渲染的输出：</p> <pre><code class="language-typograms">             ___________________
+            /                  /|
+           /__________________/ |
+          |                  |  |
+          |     Distill      |  |
+          |                  |  |
+          |                  | /
+          |__________________|/
+</code></pre> <hr/> <h2 id="layouts">布局</h2> <p>主文本列被称为正文。它是任何直接后代的默认布局 <code class="language-plaintext highlighter-rouge">d-article</code> 元素。</p> <div class="fake-img l-body"> <p>.l-body</p> </div> <p> 对于您希望显示稍大一些的图像，请尝试 <code class="language-plaintext highlighter-rouge">.l-page</code>：</p> <div class="fake-img l-page"> <p>.l-page</p> </div> <p>所有这些都有一个外凸变体，如果您想让它从正文中稍微突出一点。例如：</p> <div class="fake-img l-body-outset"> <p>.l-body-outset</p> </div> <div class="fake-img l-page-outset"> <p>.l-page-outset</p> </div> <p>有时您会希望使用整个浏览器宽度。为此，请使用 <code class="language-plaintext highlighter-rouge">.l-screen</code>. 你还可以通过使用 inset 变体将元素从浏览器边缘稍微缩进一些。</p> <div class="fake-img l-screen"> <p>.l-screen</p> </div> <div class="fake-img l-screen-inset"> <p>.l-screen-inset</p> </div> <p>最终布局用于边注、附注和脚注。它不会中断正常的 <code class="language-plaintext highlighter-rouge">.l-body</code> 除了在移动屏幕尺寸上，文本大小保持一致。</p> <div class="fake-img l-gutter"> <p>.l-gutter</p> </div> <hr/> <h2 id="sidenotes">旁注</h2> <p>Distill 支持旁注，它类似于脚注，但放置在页面的边缘。它们对于提供额外的上下文或参考而不打断主要文本的流畅性非常有用。</p> <p>创建脚注有两种主要方法：</p> <p><strong>使用 <code class="language-plaintext highlighter-rouge">&lt;aside&gt;</code> 标签：</strong></p> <p>以下代码创建了一个边注，使用 <strong><em>Distill的样式</em></strong> 在边距中：</p> <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;aside&gt;&lt;p&gt;</span>This is a sidenote using aside tag.<span class="nt">&lt;/p&gt;&lt;/aside&gt;</span>
+</code></pre></div></div> <aside><p> 这是一个使用 `&lt;aside&gt;` 标签的旁注</p> </aside> <p>我们还可以将图像添加到旁注中（点击图像以放大查看更大版本）：</p> <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;aside&gt;</span>
+  {% include figure.liquid loading="eager" path="assets/img/rhino.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+  <span class="nt">&lt;p&gt;</span>
+    F.J. Cole, “The History of Albrecht Dürer’s Rhinoceros in Zoological Literature,” Science, Medicine, and History: Essays on the Evolution of
+    Scientific Thought and Medical Practice (London, 1953), ed. E. Ashworth Underwood, 337-356. From page 71 of Edward Tufte’s Visual Explanations.
+  <span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/aside&gt;</span>
+</code></pre></div></div> <aside> <figure> <picture> <source class="responsive-img-srcset" sizes="95vw" srcset="/assets/img/rhino-480.webp 480w,/assets/img/rhino-800.webp 800w,/assets/img/rhino-1400.webp 1400w," type="image/webp"/> <img class="img-fluid rounded z-depth-1" data-zoomable="" height="auto" loading="eager" onerror="this.onerror=null; document.querySelectorAll('.responsive-img-srcset').forEach(function (n) { n.remove(); });" src="/assets/img/rhino.png" width="100%"/> </picture> </figure> <p>F.J. Cole, “The History of Albrecht Dürer’s Rhinoceros in Zoological Literature,” Science, Medicine, and History: Essays on the Evolution of Scientific Thought and Medical Practice (London, 1953), ed. E. Ashworth Underwood, 337-356. From page 71 of Edward Tufte’s Visual Explanations.</p> </aside> <p>旁注还可以包含方程式和链接：</p> <p>在物理学中，质能等价是系统静止参考系中质量和能量之间的关系。两者仅相差一个乘法常数和测量单位。</p> <aside> <p>这个原理由爱因斯坦著名的公式定义：$E = mc^2$ <a href="https://en.wikipedia.org/wiki/Mass%E2%80%93energy_equivalence" rel="external nofollow noopener" target="_blank">(来源：维基百科)</a></p> </aside> <p><strong>使用 <code class="language-plaintext highlighter-rouge">l-gutter</code> class:</strong></p> <p>以下代码创建了一个边注，使用 <strong><em>al-folio 的样式</em></strong> 在边距中：</p> <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"l-gutter"</span><span class="nt">&gt;&lt;p&gt;</span>This is a sidenote using l-gutter class.<span class="nt">&lt;/p&gt;&lt;/div&gt;</span>
+</code></pre></div></div> <div class="l-gutter"> <p> 这是一个使用 `l-gutter` 类的旁注。 </p> </div> <hr/> <h2 id="other-typography">其他排版？</h2> <p>强调，也就是斜体，使用 <em>星号</em> (<code class="language-plaintext highlighter-rouge">*asterisks*</code>) 或 <em>下划线</em> (<code class="language-plaintext highlighter-rouge">_underscores_</code>）。</p> <p>强调，或者说加粗，用<strong>星号</strong> 或 <strong>下划线</strong>。</p> <p>结合强调 <strong>星号和 <em>下划线</em></strong>。</p> <p>删除线使用两个波浪号。<del>划掉这个。</del></p> <ol> <li> 第一项有序列表</li> <li>另一个项目 ⋅⋅* 无序子列表。</li> <li>实际数字并不重要，只要它是一个数字 ⋅⋅1. 有序子列表</li> <li>另一个项目。</li> </ol> <p>⋅⋅⋅您可以在列表项中有正确缩进的段落。注意上方的空行，以及前导空格（至少一个，但我们这里使用三个以对齐原始 Markdown）。</p> <p>⋅⋅⋅要在没有段落的情况下换行，您需要使用两个尾随空格。⋅⋅ ⋅⋅⋅注意，这一行是单独的，但在同一段落内。⋅⋅ ⋅⋅⋅（这与典型的 GFM 换行行为相反，后者不需要尾随空格。）</p> <ul> <li> <p>无序列表可以使用星号</p> </li> <li> <p>或者减号</p> </li> <li> <p>或者加号</p> </li> </ul> <p><a href="https://www.google.com" rel="external nofollow noopener" target="_blank">我是一个内联样式链接</a></p> <p><a href="https://www.google.com" rel="external nofollow noopener" target="_blank" title="Google's Homepage">我是一个带标题的内联样式链接</a></p> <p><a href="https://www.mozilla.org" rel="external nofollow noopener" target="_blank">我是一个参考样式链接</a></p> <p><a href="https://slashdot.org" rel="external nofollow noopener" target="_blank">您可以使用数字来定义参考样式链接</a></p> <p>或者将其留空并使用 <a href="https://www.reddit.com" rel="external nofollow noopener" target="_blank">链接文本本身</a>。</p> <p>尖括号中的 URL 和 URL 将自动转换为链接。https://www.example.com 或 <a href="https://www.example.com" rel="external nofollow noopener" target="_blank">https://www.example.com</a> 有时是 example.com （但不是在 Github 上，例如）。</p> <p>一些文字，表明引用链接可以稍后跟随。</p> <p>这是我们的标志（悬停查看标题文本）：</p> <p>内联样式：<img alt="alt text" src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png" title="Logo Title Text 1"/></p> <p>参考样式：<img alt="alt text" src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png" title="Logo Title Text 2"/></p> <p>内联 <code class="language-plaintext highlighter-rouge">code</code> 有 <code class="language-plaintext highlighter-rouge">back-ticks around</code> 它。</p> <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">秒</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">JavaScript 语法高亮</span><span class="dl">"</span><span class="p">；</span>
+<span class="nf">提醒</span><span class="p">(</span><span class="nx">秒</span><span class="p">）；</span>
+</code></pre></div></div> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">秒</span> <span class="o">=</span> <span class="sh">"</span><span class="s">Python 语法高亮</span><span class="sh">"</span>
+<span class="k">打印</span> <span class="n">秒</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>No language indicated, so no syntax highlighting.
+But let's throw in a &lt;b&gt;tag&lt;/b&gt;.
+</code></pre></div></div> <p>冒号可以用来对齐列。</p> <table> <thead> <tr> <th>表格</th> <th style="text-align: center">是</th> <th style="text-align: right">酷</th> </tr> </thead> <tbody> <tr> <td>列 3 是</td> <td style="text-align: center">右对齐</td> <td style="text-align: right">$1600</td> </tr> <tr> <td>列 2 是</td> <td style="text-align: center">居中</td> <td style="text-align: right">$12</td> </tr> <tr> <td>斑马条纹</td> <td style="text-align: center">很整洁</td> <td style="text-align: right">$1</td> </tr> </tbody> </table> <p>每个标题单元格之间必须至少有3个破折号。外部的竖线（|）是可选的，并且您不需要让原始的Markdown对齐得很漂亮。您还可以使用内联Markdown。</p> <table> <thead> <tr> <th>Markdown</th> <th>Less</th> <th>漂亮</th> </tr> </thead> <tbody> <tr> <td><em>仍然</em></td> <td><code class="language-plaintext highlighter-rouge">renders</code></td> <td><strong>很好地</strong></td> </tr> <tr> <td>1</td> <td>2</td> <td>3</td> </tr> </tbody> </table> <blockquote> <p>引用块在电子邮件中非常方便，可以模拟回复文本。这一行是同一引用的一部分。</p> </blockquote> <p>引用中断。</p> <blockquote> <p>这是一个非常长的句子，即使换行也会被正确引用。哦，天哪，让我们继续写下去，确保这足够长，实际上会为每个人换行。哦，你可以 <em>放置</em> <strong>Markdown</strong> 转换为一个块引用。</p> </blockquote> <p>这是我们开始的一行。</p> <p>这一行与上面的一行由两个换行符分隔，因此它将是一个 <em>单独段落</em>。</p> <p>这一行也是一个单独的段落，但是……这一行仅由一个换行符分隔，因此它在 中是单独的一行。<em>同一段落</em>。</p> </d-article> <d-appendix> <d-footnote-list></d-footnote-list> <d-citation-list></d-citation-list> </d-appendix> <d-bibliography src="/assets/bibliography/2018-12-22-distill.bib"></d-bibliography> <d-article> <h2 class="text-3xl font-semibold mb-4 mt-12">喜欢阅读这篇文章吗？</h2> <p class="mb-2">以下是一些您可能会喜欢阅读的文章：</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/" rel="noopener noreferrer" target="_blank"> Google Gemini 更新：Flash 1.5、Gemma 2 和 Project Astra</a> <svg aria-hidden="true" height="1rem" viewbox="0 0 30 30" width="1rem" xmlns="http://www.w3.org/2000/svg"> <path class="icon_svg-stroke" d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" fill="none" fill-rule="evenodd" stroke="#999" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path> </svg> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="https://medium.com/@al-folio/displaying-external-posts-on-your-al-folio-blog-b60a1d241a0a?source=rss-17feae71c3c4------2" rel="noopener noreferrer" target="_blank">在您的 al-folio 博客上显示外部帖子</a> <svg aria-hidden="true" height="1rem" viewbox="0 0 30 30" width="1rem" xmlns="http://www.w3.org/2000/svg"> <path class="icon_svg-stroke" d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" fill="none" fill-rule="evenodd" stroke="#999" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path> </svg> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2025/plotly/">带有 plotly.js 的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/photo-gallery/">带有图片库的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/tabs/">带有标签页的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/typograms/">带有 typograms 的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/post-citation/">一个可以被引用的帖子</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/pseudocode/">带有伪代码的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/code-diff/">带有代码差异的文章</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/zh/blog/2024/advanced-images/">一个带有高级图像组件的帖子</a> </li> </ul> <br/> <br/> <div id="giscus_thread"> <blockquote class="block-danger"> <h5>giscus 评论配置错误</h5> <p>请按照以下说明操作 <a href="http://giscus.app" rel="external nofollow noopener" target="_blank">http://giscus.app</a> 并更新您的 giscus 配置。</p> <p>缺少必需的键：<code>repo_id, category_id</code>。</p> </blockquote> </div> </d-article> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Guohao Zhang. <style> footer[role="contentinfo"]{display:none!important} body{padding-bottom:0!important} a.nav-link[href="/music/"]{font-size:0} a.nav-link[href="/music/"]::after{content:"";display:inline-block;width:26px;height:26px;vertical-align:middle;background:url(/assets/img/favicon-oyster.png) center/contain no-repeat} a.navbar-brand{font-weight:700!important} a[title="Rss icon"]{display:none!important} </style> </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script src="/assets/js/distillpub/overrides.js"></script> <script crossorigin="anonymous" defer="" integrity="sha256-TtLOdUA8mstPoO6sGvHIGx2ceXrrX4KgIItO06XOn8A=" src="https://cdn.jsdelivr.net/npm/mermaid@10.7.0/dist/mermaid.min.js"></script> <script crossorigin="anonymous" defer="" integrity="sha256-1rA678n2xEx7x4cTZ5x4wpUCj6kUMZEZ5cxLSVSFWxw=" src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script> <script defer="" src="/assets/al_charts/js/mermaid-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" integrity="sha256-eU2TVHX633T1o/bTQp6iIJByYJEtZThhF9bKz/DcbbY=" src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script> <script defer="" src="/assets/al_charts/js/diff2html-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" integrity="sha256-MgH13bFTTNqsnuEoqNPBLDaqxjGH+lCpqrukmXc8Ppg=" src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script> <script defer="" src="/assets/al_charts/js/leaflet-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" defer="" integrity="sha256-0q+JdOlScWOHcunpUk21uab1jW7C1deBQARHtKMcaB4=" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script> <script defer="" src="/assets/al_charts/js/chartjs-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" integrity="sha256-QvgynZibb2U53SsVu98NggJXYqwRL7tg3FeyfXvPOUY=" src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script> <script crossorigin="anonymous" integrity="sha256-sm6Ui9w41++ZCWmIWDLC18a6ki72FQpWDiYTDxEPXwU=" src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/theme/dark-fresh-cut.js"></script> <script defer="" src="/assets/al_charts/js/echarts-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" defer="" integrity="sha256-Yot/cfgMMMpFwkp/5azR20Tfkt24PFqQ6IQS+80HIZs=" src="https://cdn.jsdelivr.net/npm/vega@5.27.0/build/vega.min.js"></script> <script crossorigin="anonymous" defer="" integrity="sha256-TvBvIS5jUN4BSy009usRjNzjI1qRrHPYv7xVLJyjUyw=" src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3/build/vega-lite.min.js"></script> <script crossorigin="anonymous" defer="" integrity="sha256-FPCJ9JYCC9AZSpvC/t/wHBX7ybueZhIqOMjpWqfl3DU=" src="https://cdn.jsdelivr.net/npm/vega-embed@6.24.0/build/vega-embed.min.js"></script> <script defer="" src="/assets/al_charts/js/vega-setup.js" type="text/javascript"></script> <script crossorigin="anonymous" defer="" id="MathJax-script" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" type="text/javascript"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script crossorigin="anonymous" defer="" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script> <script crossorigin="anonymous" defer="" integrity="sha256-7SCmUR11IG4MkSoeLUq0pombv7oeV7yZuu7Z82e4Uy4=" src="https://cdn.jsdelivr.net/npm/@planktimerr/tikzjax@1.0.8/dist/tikzjax.js" type="text/javascript"></script> <script src="/assets/js/typograms.js?v=062e75bede72543443762dc3fe36c7a5"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer="" src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer="" src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer="" src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script crossorigin="anonymous" defer="" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script> <script defer="" src="/assets/al_img_tools/js/zoom.js"></script> <script defer="" src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script crossorigin="anonymous" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js"></script> <script>
+    addBackToTop();
+  </script> <script src="/assets/al_search/js/search/ninja-keys.min.js" type="module"></script> <ninja-keys hidebreadcrumbs="" noautoloadmdicons="" placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum vitae of Guohao Zhang.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-news",
+          title: "news",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/news/";
+          },
+        },{id: "nav-muses",
+          title: "muses",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/music/";
+          },
+        },{id: "post-a-post-with-plotly-js",
+        
+          title: "a post with plotly.js",
+        
+        description: "this is what included plotly.js code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/plotly/";
+          
+        },
+      },{id: "post-a-post-with-image-galleries",
+        
+          title: "a post with image galleries",
+        
+        description: "this is what included image galleries could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/photo-gallery/";
+          
+        },
+      },{id: "post-google-gemini-updates-flash-1-5-gemma-2-and-project-astra",
+        
+          title: 'Google Gemini updates: Flash 1.5, Gemma 2 and Project Astra <svg width="1.2rem" height="1.2rem" top=".5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#999" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+        
+        description: "We’re sharing updates across our Gemini family of models and a glimpse of Project Astra, our vision for the future of AI assistants.",
+        section: "Posts",
+        handler: () => {
+          
+            window.open("https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/", "_blank");
+          
+        },
+      },{id: "post-a-post-with-tabs",
+        
+          title: "a post with tabs",
+        
+        description: "this is what included tabs in a post could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/tabs/";
+          
+        },
+      },{id: "post-a-post-with-typograms",
+        
+          title: "a post with typograms",
+        
+        description: "this is what included typograms code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/typograms/";
+          
+        },
+      },{id: "post-a-post-that-can-be-cited",
+        
+          title: "a post that can be cited",
+        
+        description: "this is what a post that can be cited looks like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/post-citation/";
+          
+        },
+      },{id: "post-a-post-with-pseudo-code",
+        
+          title: "a post with pseudo code",
+        
+        description: "this is what included pseudo code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/pseudocode/";
+          
+        },
+      },{id: "post-a-post-with-code-diff",
+        
+          title: "a post with code diff",
+        
+        description: "this is how you can display code diffs",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/code-diff/";
+          
+        },
+      },{id: "post-a-post-with-advanced-image-components",
+        
+          title: "a post with advanced image components",
+        
+        description: "this is what advanced image components could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/advanced-images/";
+          
+        },
+      },{id: "post-a-post-with-vega-lite",
+        
+          title: "a post with vega lite",
+        
+        description: "this is what included vega lite code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/vega-lite/";
+          
+        },
+      },{id: "post-a-post-with-geojson",
+        
+          title: "a post with geojson",
+        
+        description: "this is what included geojson code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/geojson-map/";
+          
+        },
+      },{id: "post-a-post-with-echarts",
+        
+          title: "a post with echarts",
+        
+        description: "this is what included echarts code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/echarts/";
+          
+        },
+      },{id: "post-a-post-with-chart-js",
+        
+          title: "a post with chart.js",
+        
+        description: "this is what included chart.js code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/chartjs/";
+          
+        },
+      },{id: "post-a-post-with-tikzjax",
+        
+          title: "a post with TikZJax",
+        
+        description: "this is what included TikZ code could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/tikzjax/";
+          
+        },
+      },{id: "post-a-post-with-bibliography",
+        
+          title: "a post with bibliography",
+        
+        description: "an example of a blog post with bibliography",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/post-bibliography/";
+          
+        },
+      },{id: "post-a-post-with-jupyter-notebook",
+        
+          title: "a post with jupyter notebook",
+        
+        description: "an example of a blog post with jupyter notebook",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/jupyter-notebook/";
+          
+        },
+      },{id: "post-a-post-with-custom-blockquotes",
+        
+          title: "a post with custom blockquotes",
+        
+        description: "an example of a blog post with custom blockquotes",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/custom-blockquotes/";
+          
+        },
+      },{id: "post-a-post-with-table-of-contents-on-a-sidebar",
+        
+          title: "a post with table of contents on a sidebar",
+        
+        description: "an example of a blog post with table of contents on a sidebar",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/sidebar-table-of-contents/";
+          
+        },
+      },{id: "post-a-post-with-audios",
+        
+          title: "a post with audios",
+        
+        description: "this is what included audios could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/audios/";
+          
+        },
+      },{id: "post-a-post-with-videos",
+        
+          title: "a post with videos",
+        
+        description: "this is what included videos could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/videos/";
+          
+        },
+      },{id: "post-displaying-beautiful-interactive-tables",
+        
+          title: "displaying beautiful interactive tables",
+        
+        description: "an example of how to use interactive tables in al-folio",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/tables/";
+          
+        },
+      },{id: "post-a-post-with-table-of-contents",
+        
+          title: "a post with table of contents",
+        
+        description: "an example of a blog post with table of contents",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2023/table-of-contents/";
+          
+        },
+      },{id: "post-a-post-with-giscus-comments",
+        
+          title: "a post with giscus comments",
+        
+        description: "an example of a blog post with giscus comments",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2022/giscus-comments/";
+          
+        },
+      },{id: "post-displaying-external-posts-on-your-al-folio-blog",
+        
+          title: 'Displaying External Posts on Your al-folio Blog <svg width="1.2rem" height="1.2rem" top=".5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#999" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.open("https://medium.com/@al-folio/displaying-external-posts-on-your-al-folio-blog-b60a1d241a0a?source=rss-17feae71c3c4------2", "_blank");
+          
+        },
+      },{id: "post-a-post-with-redirect",
+        
+          title: "a post with redirect",
+        
+        description: "you can also redirect to assets like pdf",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/assets/pdf/example_pdf.pdf";
+          
+        },
+      },{id: "post-a-post-with-diagrams",
+        
+          title: "a post with diagrams",
+        
+        description: "an example of a blog post with diagrams",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2021/diagrams/";
+          
+        },
+      },{id: "post-a-distill-style-blog-post",
+        
+          title: "a distill-style blog post",
+        
+        description: "an example of a distill-style blog post and main elements",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2021/distill/";
+          
+        },
+      },{id: "post-a-post-with-twitter",
+        
+          title: "a post with twitter",
+        
+        description: "an example of a blog post with twitter",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2020/twitter/";
+          
+        },
+      },{id: "post-a-post-with-disqus-comments",
+        
+          title: "a post with disqus comments",
+        
+        description: "an example of a blog post with disqus comments",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2015/disqus-comments/";
+          
+        },
+      },{id: "post-a-post-with-math",
+        
+          title: "a post with math",
+        
+        description: "an example of a blog post with some math",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2015/math/";
+          
+        },
+      },{id: "post-a-post-with-code",
+        
+          title: "a post with code",
+        
+        description: "an example of a blog post with some code",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2015/code/";
+          
+        },
+      },{id: "post-a-post-with-images",
+        
+          title: "a post with images",
+        
+        description: "this is what included images could look like",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2015/images/";
+          
+        },
+      },{id: "post-a-post-with-formatting-and-links",
+        
+          title: "a post with formatting and links",
+        
+        description: "march & april, looking forward to summer",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2015/formatting-and-links/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-our-paper-a-large-scale-meg-and-eeg-dataset-for-object-recognition-in-naturalistic-scenes-is-published-in-scientific-data-tada",
+          title: 'Our paper *A large-scale MEG and EEG dataset for object recognition in naturalistic...',
+          description: "",
+          section: "News",},{id: "news-started-my-phd-in-psychology-at-beijing-normal-university-rocket",
+          title: 'Started my PhD in Psychology at Beijing Normal University. <img class="emoji" title=":rocket:" alt=":rocket:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f680.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "projects-project-3-with-very-long-name",
+          title: 'project 3 with very long name',
+          description: "a project that redirects to another website",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_project/";
+            },},{id: "projects-project-4",
+          title: 'project 4',
+          description: "another without an image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_project/";
+            },},{id: "projects-project-5",
+          title: 'project 5',
+          description: "a project with a background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_project/";
+            },},{id: "projects-project-6",
+          title: 'project 6',
+          description: "a project with no image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_project/";
+            },},{id: "projects-project-7",
+          title: 'project 7',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/7_project/";
+            },},{id: "projects-project-8",
+          title: 'project 8',
+          description: "an other project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/8_project/";
+            },},{id: "projects-project-9",
+          title: 'project 9',
+          description: "another project with an image 🎉",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/9_project/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/colehank", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0009-0008-5892-6961", "_blank");
+        },
+      },{
+        id: 'social-scholar',
+        title: 'Google Scholar',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://scholar.google.com/citations?user=oLhYDMYAAAAJ", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://163cn.tv/bbe0924E", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
