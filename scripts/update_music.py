@@ -14,6 +14,7 @@ Sources (override via env if they ever change):
 
 import json
 import os
+import re
 import sys
 import time
 import urllib.parse
@@ -44,7 +45,12 @@ def _get(url):
 
 
 def _sized(pic):
-    return pic + "?param=512y512" if pic else ""  # ask the CDN for a sensible size
+    if not pic:
+        return ""
+    # NetEase serves covers from a random p1/p2/p3 CDN host each request; pin it
+    # to p1 so re-runs are deterministic and don't churn _data/music.yml.
+    pic = re.sub(r"^https?://p\d\.music\.126\.net", "https://p1.music.126.net", pic)
+    return pic + "?param=512y512"  # ask the CDN for a sensible size
 
 
 def _year(ms):
