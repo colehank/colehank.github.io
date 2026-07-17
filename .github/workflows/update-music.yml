@@ -1,0 +1,55 @@
+name: Update Music from NetEase
+
+# Rebuilds _data/music.yml from your NetEase Cloud Music artist page so new
+# releases show up on the /music/ page automatically. Uses only public GET
+# endpoints (no login). If a run fails (e.g. NetEase rate-limits the runner IP),
+# the last good _data/music.yml stays committed and the site never breaks.
+
+on:
+  schedule:
+    - cron: "0 2 1 * *" # 1st of every month, 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write # needed to trigger the deploy workflow after a change
+
+jobs:
+  update-music:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Fetch music from NetEase
+        run: python scripts/update_music.py
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Commit and push if changed
+        id: commit
+        run: |
+          git add _data/music.yml
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ _data/music.yml unchanged." >> "$GITHUB_STEP_SUMMARY"
+          else
+            git commit -m "Update music from NetEase"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "✅ _data/music.yml updated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Trigger site deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml

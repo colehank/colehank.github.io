@@ -1,0 +1,54 @@
+name: Update Publications from OpenAlex
+
+# Rebuilds _bibliography/papers.bib from your OpenAlex author profile so new
+# papers show up on the site automatically. Complements update-citations.yml,
+# which only refreshes citation counts (not the list of papers).
+
+on:
+  schedule:
+    - cron: "0 1 * * 1" # every Monday 01:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write # needed to trigger the deploy workflow after a change
+
+jobs:
+  update-publications:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Fetch publications from OpenAlex
+        run: python scripts/update_publications.py
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Commit and push if changed
+        id: commit
+        run: |
+          git add _bibliography/papers.bib assets/img/publication_preview
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ papers.bib unchanged." >> "$GITHUB_STEP_SUMMARY"
+          else
+            git commit -m "Update publications from OpenAlex"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "✅ papers.bib updated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Trigger site deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml

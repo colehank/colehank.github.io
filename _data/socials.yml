@@ -1,0 +1,14 @@
+# this file contains the social media links and usernames of the author
+# the socials will be displayed in the order they are defined here
+# for more information, please refer to the documentation of jekyll-socials plugin: https://github.com/george-gca/jekyll-socials
+# order: GitHub, ORCID, Google Scholar, NetEase Cloud Music (email intentionally hidden)
+github_username: colehank # your GitHub username
+orcid_id: 0009-0008-5892-6961 # your ORCID ID
+scholar_userid: oLhYDMYAAAAJ # your Google Scholar ID
+# email: guohao2045@gmail.com # hidden from the navbar social icons
+rss_icon: false # RSS feed icon hidden
+# wechat_qr: # filename of your wechat qr-code saved as an image (e.g., wechat-qr.png if saved to assets/img/wechat-qr.png)
+custom_social: # NetEase Cloud Music artist page
+  logo: /assets/img/netease.svg # can be png, svg, jpg
+  title: NetEase Cloud Music
+  url: https://163cn.tv/bbe0924E

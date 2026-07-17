@@ -1,0 +1,105 @@
+{
+  "basics": {
+    "name": "Guohao Zhang",
+    "label": "PhD Student in Psychology",
+    "image": "",
+    "email": "guohao2045@gmail.com",
+    "phone": "",
+    "summary": "PhD student at the Faculty of Psychology, Beijing Normal University. Research interests: NeuroAI, LLM-based agent memory, and decentralized science.",
+    "location": {
+      "city": "Beijing",
+      "countryCode": "CN",
+      "region": "China"
+    },
+    "profiles": [
+      {
+        "network": "Google Scholar",
+        "username": "Guohao Zhang",
+        "url": "https://scholar.google.com/citations?user=oLhYDMYAAAAJ"
+      },
+      {
+        "network": "ORCID",
+        "username": "0009-0008-5892-6961",
+        "url": "https://orcid.org/0009-0008-5892-6961"
+      },
+      {
+        "network": "GitHub",
+        "username": "colehank",
+        "url": "https://github.com/colehank"
+      }
+    ]
+  },
+  "work": [],
+  "volunteer": [],
+  "education": [
+    {
+      "institution": "Beijing Normal University",
+      "location": "Beijing, China",
+      "url": "https://www.bnu.edu.cn/",
+      "area": "Psychology",
+      "studyType": "PhD",
+      "startDate": "2025-09-01",
+      "endDate": "2029-06-30",
+      "score": "",
+      "courses": [],
+      "highlights": ["NeuroAI", "LLM-based Agent Memory", "Decentralized Science"]
+    },
+    {
+      "institution": "Beijing Normal University",
+      "location": "Beijing, China",
+      "url": "https://www.bnu.edu.cn/",
+      "area": "Psychology",
+      "studyType": "MSc",
+      "startDate": "2022-09-01",
+      "endDate": "2025-06-30",
+      "score": "",
+      "courses": [],
+      "highlights": []
+    },
+    {
+      "institution": "Southwest University of Science and Technology",
+      "location": "Mianyang, China",
+      "url": "https://www.swust.edu.cn/",
+      "area": "",
+      "studyType": "BSc",
+      "startDate": "2018-09-01",
+      "endDate": "2022-06-30",
+      "score": "",
+      "courses": [],
+      "highlights": []
+    }
+  ],
+  "awards": [],
+  "certificates": [],
+  "publications": [
+    {
+      "name": "A large-scale MEG and EEG dataset for object recognition in naturalistic scenes",
+      "publisher": "Scientific Data",
+      "releaseDate": "2025-05-21",
+      "url": "https://www.nature.com/articles/s41597-025-05174-7",
+      "summary": "Zhang, G., Zhou, M., Zhen, S., Tang, S., Li, Z., & Zhen, Z. (2025). The Natural Object Dataset (NOD) is extended with MEG and EEG responses to naturalistic scenes, yielding a multimodal fMRI/MEG/EEG dataset."
+    }
+  ],
+  "skills": [],
+  "languages": [
+    {
+      "language": "Chinese",
+      "fluency": "Native speaker",
+      "icon": ""
+    },
+    {
+      "language": "English",
+      "fluency": "Professional working proficiency",
+      "icon": ""
+    }
+  ],
+  "interests": [
+    {
+      "name": "Research Interests",
+      "icon": "fa-solid fa-brain",
+      "keywords": ["NeuroAI", "LLM-based Agent Memory", "Decentralized Science"]
+    }
+  ],
+  "references": [],
+  "projects": []
+}
