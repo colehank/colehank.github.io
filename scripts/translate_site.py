@@ -32,7 +32,7 @@ ASSET_EXTS = (".pdf", ".xml", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
 GLOSSARY = (
     "Apply this glossary exactly: 'Guohao Zhang' -> '张国浩'; "
     "'Department of Psychology' -> '心理学部'; 'agent'/'agents' -> '智能体'; "
-    "'muses' -> '灵感'. "
+    "'muses' -> '灵感'; 'CV' -> '简历'. "
 )
 
 # Navbar tab labels use a fixed map (short ambiguous words translate poorly).
@@ -140,8 +140,8 @@ def _text_nodes(scope, Comment):
 
 
 def target_nodes(soup, is_about):
-    """Nodes to API-translate: <title>, and (about only) the body. Nav labels
-    are handled separately via NAV_MAP."""
+    """Nodes to API-translate: <title>, each page's big title + subtitle, and
+    (about only) the full body. Nav labels use NAV_MAP; the name uses fix_name."""
     from bs4 import Comment
     nodes = []
     title = soup.find("title")
@@ -150,6 +150,10 @@ def target_nodes(soup, is_about):
     if is_about:
         body = soup.find("article") or soup.find("body") or soup
         nodes += _text_nodes(body, Comment)
+    else:
+        for cls in ("post-title", "post-description", "music-intro"):
+            for el in soup.find_all(class_=cls):
+                nodes += _text_nodes(el, Comment)
     # de-dupe by object identity, preserve order
     seen, uniq = set(), []
     for n in nodes:
@@ -180,6 +184,23 @@ def apply_nav_map(soup):
             key = str(node).strip()
             if key in NAV_MAP:
                 node.replace_with(NavigableString(str(node).replace(key, NAV_MAP[key])))
+
+
+def fix_name(soup):
+    """In the Chinese page, render every 'Guohao Zhang' as '张国浩' — including the
+    navbar brand and page title where the name is split across a <span>."""
+    from bs4 import NavigableString
+    for el in soup.select("a.navbar-brand, h1.post-title"):
+        txt = el.get_text()
+        if "Guohao" in txt and "Zhang" in txt:
+            el.clear()
+            el.append(NavigableString("张国浩"))
+    for node in soup.find_all(string=True):
+        if node.parent and node.parent.name in SKIP_TAGS:
+            continue
+        s = str(node)
+        if "Guohao Zhang" in s:
+            node.replace_with(NavigableString(s.replace("Guohao Zhang", "张国浩")))
 
 
 def inject_toggle(soup, target_href, label):
@@ -239,6 +260,7 @@ def main():
         for n in nodes:
             n.replace_with(NavigableString(tr(str(n))))
         apply_nav_map(soup)
+        fix_name(soup)
         if soup.html:
             soup.html["lang"] = "zh-CN"
         rewrite_links(soup)
