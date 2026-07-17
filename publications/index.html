@@ -37,7 +37,22 @@ img.medium-zoom-image--opened {
   object-fit: contain !important;
   border-radius: 0 !important;
 }
-</style> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Guohao Zhang. <style> footer[role="contentinfo"]{display:none!important} body{padding-bottom:0!important} a.nav-link[href="/music/"]{font-size:0} a.nav-link[href="/music/"]::after{content:"";display:inline-block;width:26px;height:26px;vertical-align:middle;background:url(/assets/img/favicon-oyster.png) center/contain no-repeat} a.navbar-brand{font-weight:700!important} a[title="Rss icon"]{display:none!important} </style> </div> </footer> <script>
+</style> <script>
+  // Make the "DOI" button reveal the DOI string instead of opening doi.org.
+  (function () {
+    document.querySelectorAll('.publications a.btn[href*="doi.org"]').forEach(function (a) {
+      if (a.textContent.trim() !== "DOI") return; // leave HTML/PDF/other buttons alone
+      var doi = a.getAttribute("href").replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+      a.setAttribute("title", "Show / hide the DOI");
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        var open = a.dataset.open === "1";
+        a.textContent = open ? "DOI" : doi;
+        a.dataset.open = open ? "0" : "1";
+      });
+    });
+  })();
+</script> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Guohao Zhang. <style> footer[role="contentinfo"]{display:none!important} body{padding-bottom:0!important} a.nav-link[href="/music/"]{font-size:0} a.nav-link[href="/music/"]::after{content:"";display:inline-block;width:26px;height:26px;vertical-align:middle;background:url(/assets/img/favicon-oyster.png) center/contain no-repeat} a.navbar-brand{font-weight:700!important} a[title="Rss icon"]{display:none!important} </style> </div> </footer> <script>
   window.alFolio = {
     compatBootstrap: false
   };
