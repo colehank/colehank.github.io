@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate _data/music.yml from a NetEase Cloud Music artist page.
+"""Regenerate _data/music.yml from NetEase Cloud Music (artist + radio).
 
 Mirrors the pattern of scripts/update_publications.py / bin/update_scholar_citations.py:
 fetch public data, write a _data/*.yml file, let the workflow commit it only when
@@ -7,9 +7,9 @@ it actually changed. Uses only NetEase's *public* GET endpoints (no login/cookie
 so it can run unattended in CI. The live site build is separate — if a run fails,
 the last good _data/music.yml stays committed and the page never breaks.
 
-Artist id comes from the resolved NetEase artist link in _data/socials.yml
-(https://163cn.tv/... -> music.163.com/artist?id=<ARTIST_ID>). Override with the
-MUSIC_ARTIST_ID env var if it ever changes.
+Sources (override via env if they ever change):
+  MUSIC_ARTIST_ID  the artist page (163cn.tv/... -> music.163.com/artist?id=<id>)
+  MUSIC_RADIO_ID   the dj radio / podcast (music.163.com/#/djradio?id=<id>)
 """
 
 import json
@@ -20,6 +20,7 @@ import urllib.parse
 import urllib.request
 
 ARTIST_ID = os.environ.get("MUSIC_ARTIST_ID", "32272234")
+RADIO_ID = os.environ.get("MUSIC_RADIO_ID", "341843071")
 OUT_PATH = os.path.join(os.path.dirname(__file__), "..", "_data", "music.yml")
 
 HEADERS = {
@@ -42,16 +43,36 @@ def _get(url):
     return data
 
 
+def _sized(pic):
+    return pic + "?param=512y512" if pic else ""  # ask the CDN for a sensible size
+
+
+def _year(ms):
+    return str(time.gmtime(int(ms) / 1000).tm_year) if ms and ms > 0 else ""
+
+
 def fetch_songs(artist_id):
-    """Return [{title, id}] for the artist's hot songs, newest first."""
+    """Return the artist's hot songs as [{title, url, cover, subtitle}]."""
     data = _get(f"https://music.163.com/api/artist/{artist_id}")
     songs = data.get("hotSongs") or []
-    # hotSongs is roughly release-order; keep as returned but newest first.
-    return [{"id": s["id"], "title": s["name"]} for s in songs]
+    covers = fetch_song_covers([s["id"] for s in songs])
+    out = []
+    for s in songs:
+        meta = covers.get(s["id"], {})
+        subtitle = " · ".join(b for b in (meta.get("year"), "original") if b)
+        out.append(
+            {
+                "title": s["name"],
+                "url": f"https://music.163.com/song?id={s['id']}",
+                "cover": _sized(meta.get("cover", "")),
+                "subtitle": subtitle,
+            }
+        )
+    return out
 
 
-def fetch_covers(song_ids):
-    """Map song id -> {cover, album, year} via the song detail endpoint."""
+def fetch_song_covers(song_ids):
+    """Map song id -> {cover, year} via the song detail endpoint."""
     if not song_ids:
         return {}
     ids = urllib.parse.quote(json.dumps(song_ids))
@@ -59,70 +80,91 @@ def fetch_covers(song_ids):
     out = {}
     for s in data.get("songs") or []:
         album = s.get("album") or s.get("al") or {}
-        pic = album.get("picUrl") or ""
-        year = ""
-        pub = s.get("publishTime") or album.get("publishTime")
-        if pub and pub > 0:
-            # publishTime is unix ms; take the exact UTC year.
-            year = str(time.gmtime(int(pub) / 1000).tm_year)
-        out[s["id"]] = {"cover": pic, "album": album.get("name") or "", "year": year}
+        out[s["id"]] = {
+            "cover": album.get("picUrl") or "",
+            "year": _year(s.get("publishTime") or album.get("publishTime")),
+        }
     return out
 
 
-def build_entries(artist_id):
-    songs = fetch_songs(artist_id)
-    covers = fetch_covers([s["id"] for s in songs])
-    entries = []
-    for s in songs:
-        meta = covers.get(s["id"], {})
-        cover = meta.get("cover") or ""
-        if cover:
-            cover += "?param=512y512"  # ask the NetEase CDN for a sensible size
-        subtitle_bits = [b for b in (meta.get("year"), "original") if b]
-        entries.append(
+def fetch_radio(radio_id):
+    """Return {name, url, episodes:[{title, url, cover, subtitle}]} for a dj radio."""
+    detail = _get(f"https://music.163.com/api/djradio/get?id={radio_id}")
+    info = detail.get("djRadio") or {}
+    progs = _get(
+        f"https://music.163.com/api/dj/program/byradio"
+        f"?radioId={radio_id}&limit=200&asc=false"
+    ).get("programs") or []
+    episodes = []
+    for p in progs:
+        cover = p.get("coverUrl") or ((p.get("mainSong") or {}).get("album") or {}).get("picUrl") or ""
+        subtitle = " · ".join(b for b in (_year(p.get("createTime")), "radio") if b)
+        episodes.append(
             {
-                "title": s["title"],
-                "url": f"https://music.163.com/song?id={s['id']}",
-                "cover": cover,
-                "subtitle": " · ".join(subtitle_bits),
+                "title": p["name"],
+                "url": f"https://music.163.com/program?id={p['id']}",
+                "cover": _sized(cover),
+                "subtitle": subtitle,
             }
         )
-    return entries
+    return {
+        "name": info.get("name") or "Radio",
+        "url": f"https://music.163.com/djradio?id={radio_id}",
+        "episodes": episodes,
+    }
 
 
-def dump_yaml(entries):
+def _yaml_entry(e, indent):
+    pad = " " * indent
+    lines = [
+        f"{pad}- title: {json.dumps(e['title'], ensure_ascii=False)}",
+        f"{pad}  url: {json.dumps(e['url'], ensure_ascii=False)}",
+        f"{pad}  cover: {json.dumps(e['cover'], ensure_ascii=False)}",
+    ]
+    if e.get("subtitle"):
+        lines.append(f"{pad}  subtitle: {json.dumps(e['subtitle'], ensure_ascii=False)}")
+    return lines
+
+
+def dump_yaml(artist_url, songs, radio):
     # JSON strings are valid YAML scalars, so json.dumps handles all escaping
     # (Chinese titles, quotes, colons) safely without a yaml dependency.
     lines = [
-        "# Auto-generated by scripts/update_music.py from the NetEase artist page.",
+        "# Auto-generated by scripts/update_music.py from NetEase (artist + radio).",
         "# Do not edit by hand — the update-music workflow overwrites this file.",
-        "# Newest first; the /music/ page renders them in this order.",
         "",
+        f"artist_url: {json.dumps(artist_url, ensure_ascii=False)}",
+        "",
+        "songs:",
     ]
-    for e in entries:
-        lines.append(f"- title: {json.dumps(e['title'], ensure_ascii=False)}")
-        lines.append(f"  url: {json.dumps(e['url'], ensure_ascii=False)}")
-        lines.append(f"  cover: {json.dumps(e['cover'], ensure_ascii=False)}")
-        if e["subtitle"]:
-            lines.append(f"  subtitle: {json.dumps(e['subtitle'], ensure_ascii=False)}")
-        lines.append("")
+    for s in songs:
+        lines += _yaml_entry(s, 0)
+    lines += [
+        "",
+        "radio:",
+        f"  name: {json.dumps(radio['name'], ensure_ascii=False)}",
+        f"  url: {json.dumps(radio['url'], ensure_ascii=False)}",
+        "  episodes:",
+    ]
+    for e in radio["episodes"]:
+        lines += _yaml_entry(e, 2)
     return "\n".join(lines).rstrip() + "\n"
 
 
 def main():
     try:
-        entries = build_entries(ARTIST_ID)
+        songs = fetch_songs(ARTIST_ID)
+        radio = fetch_radio(RADIO_ID)
     except Exception as exc:  # noqa: BLE001 — leave last-good file in place on failure
         print(f"❌ Failed to fetch music data: {exc}", file=sys.stderr)
         return 1
-    if not entries:
-        print("❌ No songs returned; leaving _data/music.yml untouched.", file=sys.stderr)
+    if not songs and not radio["episodes"]:
+        print("❌ Nothing returned; leaving _data/music.yml untouched.", file=sys.stderr)
         return 1
+    artist_url = f"https://music.163.com/artist?id={ARTIST_ID}"
     with open(OUT_PATH, "w", encoding="utf-8") as fh:
-        fh.write(dump_yaml(entries))
-    print(f"✅ Wrote {len(entries)} track(s) to _data/music.yml")
-    for e in entries:
-        print(f"   - {e['title']}  ({e['subtitle']})")
+        fh.write(dump_yaml(artist_url, songs, radio))
+    print(f"✅ Wrote {len(songs)} song(s) + {len(radio['episodes'])} radio episode(s)")
     return 0
 
 
