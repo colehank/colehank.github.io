@@ -9,20 +9,28 @@
     var box = document.getElementById("music-player");
     var frame = document.getElementById("music-player-frame");
     var openLink = document.getElementById("music-player-open");
-    document.querySelectorAll(".music-card[data-embed]").forEach(function (card) {
-      card.addEventListener("click", function (e) {
+    // Delegate in the CAPTURE phase so we intercept the click before
+    // medium-zoom (which stopPropagation()s on cover images) and before the
+    // anchor's default navigation fires.
+    document.addEventListener(
+      "click",
+      function (e) {
+        var card = e.target.closest(".music-card[data-embed]");
+        if (!card) return;
         var id = card.getAttribute("data-embed-id");
         var type = card.getAttribute("data-embed-type") || "2";
-        if (!id) return; // no id parsed -> follow the link
+        if (!id) return; // no id parsed -> let the link work
         e.preventDefault();
+        e.stopPropagation();
         var h = type === "4" ? 90 : 66; // radio players are a touch taller
         frame.style.height = h + 20 + "px";
         frame.src = "https://music.163.com/outchain/player?type=" + type + "&id=" + id + "&auto=1&height=" + h;
         openLink.href = card.href;
         box.hidden = false;
         box.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      });
-    });
+      },
+      true
+    );
     document.getElementById("music-player-close").addEventListener("click", function () {
       frame.src = "about:blank"; // stop playback
       box.hidden = true;
