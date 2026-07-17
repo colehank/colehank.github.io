@@ -27,7 +27,6 @@
         frame.src = "https://music.163.com/outchain/player?type=" + type + "&id=" + id + "&auto=1&height=" + h;
         openLink.href = card.href;
         box.hidden = false;
-        box.scrollIntoView({ behavior: "smooth", block: "nearest" });
       },
       true
     );
@@ -42,15 +41,24 @@
     font-size: 0.95rem;
   }
   #music-player {
-    position: sticky;
-    top: 70px;
-    z-index: 5;
-    max-width: 400px;
-    margin: 0 auto 1.5rem;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    width: 340px;
+    max-width: calc(100vw - 40px);
     background: var(--global-bg-color, #fff);
     border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
     overflow: hidden;
+  }
+  @media (max-width: 480px) {
+    #music-player {
+      right: 10px;
+      left: 10px;
+      bottom: 10px;
+      width: auto;
+    }
   }
   .music-player-bar {
     display: flex;
