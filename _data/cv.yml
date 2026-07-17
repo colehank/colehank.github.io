@@ -1,0 +1,52 @@
+# RenderCV v2.8 format — https://rendercv.com/
+# Push changes to this file and the "Render a CV" workflow rebuilds the PDF.
+cv:
+  name: Guohao Zhang
+  headline: PhD Student in Psychology · NeuroAI · Human Vision · Neuroimaging
+  location: Beijing, China
+  email: guohao2045@gmail.com
+  website: https://colehank.github.io
+  social_networks:
+    - network: GitHub
+      username: colehank
+    - network: ORCID
+      username: 0009-0008-5892-6961
+    - network: Google Scholar
+      username: oLhYDMYAAAAJ
+  sections:
+    Summary:
+      - bullet: PhD student in Psychology at Beijing Normal University, working at the intersection of human vision, large-scale neuroimaging (fMRI/MEG/EEG), and NeuroAI. Also interested in LLM-based agent memory and decentralized science.
+    Education:
+      - institution: Beijing Normal University
+        area: Psychology
+        degree: PhD
+        location: Beijing, China
+        start_date: 2025-09
+        end_date: present
+        highlights:
+          - Department of Psychology
+      - institution: Beijing Normal University
+        area: Psychology
+        degree: MSc
+        location: Beijing, China
+        start_date: 2022-09
+        end_date: 2025-06
+      - institution: Southwest University of Science and Technology
+        area: Psychology
+        degree: BSc
+        location: Mianyang, China
+        start_date: 2018-09
+        end_date: 2022-06
+    Publications:
+      - title: A large-scale MEG and EEG dataset for object recognition in naturalistic scenes
+        authors:
+          - "*Guohao Zhang*"
+          - Ming Zhou
+          - Shuyi Zhen
+          - Shaohua Tang
+          - Zheng Li
+          - Zonglei Zhen
+        journal: Scientific Data
+        date: 2025
+    Research Interests:
+      - bullet: "NeuroAI; visual object recognition; large-scale neuroimaging (fMRI / MEG / EEG); LLM-based agent memory; decentralized science."
