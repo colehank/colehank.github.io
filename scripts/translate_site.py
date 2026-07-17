@@ -32,7 +32,7 @@ ASSET_EXTS = (".pdf", ".xml", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
 GLOSSARY = (
     "Apply this glossary exactly: 'Guohao Zhang' -> '张国浩'; "
     "'Department of Psychology' -> '心理学部'; 'agent'/'agents' -> '智能体'; "
-    "'muses' -> '灵感'; 'CV' -> '简历'. "
+    "'muses' -> '灵感'; 'CV' -> '简历'; 'Scientific Data' -> '《科学数据》'. "
 )
 
 # Navbar tab labels use a fixed map (short ambiguous words translate poorly).
