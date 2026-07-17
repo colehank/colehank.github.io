@@ -191,7 +191,7 @@ def inject_toggle(soup, target_href, label):
     for a in ul.find_all("a", class_="nav-link"):
         if a.get_text(strip=True) in ("中文", "EN"):
             (a.find_parent("li") or a).decompose()
-    ul.append(BS(f'<li class="nav-item"><a class="nav-link" href="{target_href}">{label}</a></li>', "html.parser"))
+    ul.append(BS(f'<li class="nav-item"><a class="nav-link lang-toggle" href="{target_href}">{label}</a></li>', "html.parser"))
 
 
 def main():
