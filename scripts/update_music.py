@@ -53,32 +53,44 @@ def _sized(pic):
     return pic + "?param=512y512"  # ask the CDN for a sensible size
 
 
-def _year(ms):
-    return str(time.gmtime(int(ms) / 1000).tm_year) if ms and ms > 0 else ""
+def _date(ms):
+    """Format a NetEase unix-ms timestamp as YYYY-MM-DD in Beijing time."""
+    if not ms or ms <= 0:
+        return ""
+    return time.strftime("%Y-%m-%d", time.gmtime(int(ms) / 1000 + 8 * 3600))
+
+
+def _by_time_desc(entries):
+    """Sort newest first, then drop the private _ts sort key."""
+    entries.sort(key=lambda e: e.get("_ts") or 0, reverse=True)
+    for e in entries:
+        e.pop("_ts", None)
+    return entries
 
 
 def fetch_songs(artist_id):
-    """Return the artist's hot songs as [{title, url, cover, subtitle}]."""
+    """Return the artist's songs as [{title, url, cover, subtitle}], newest first."""
     data = _get(f"https://music.163.com/api/artist/{artist_id}")
     songs = data.get("hotSongs") or []
     covers = fetch_song_covers([s["id"] for s in songs])
     out = []
     for s in songs:
         meta = covers.get(s["id"], {})
-        subtitle = " · ".join(b for b in (meta.get("year"), "original") if b)
+        ts = meta.get("ts") or 0
         out.append(
             {
                 "title": s["name"],
                 "url": f"https://music.163.com/song?id={s['id']}",
                 "cover": _sized(meta.get("cover", "")),
-                "subtitle": subtitle,
+                "subtitle": _date(ts),
+                "_ts": ts,
             }
         )
-    return out
+    return _by_time_desc(out)
 
 
 def fetch_song_covers(song_ids):
-    """Map song id -> {cover, year} via the song detail endpoint."""
+    """Map song id -> {cover, ts} via the song detail endpoint."""
     if not song_ids:
         return {}
     ids = urllib.parse.quote(json.dumps(song_ids))
@@ -88,13 +100,13 @@ def fetch_song_covers(song_ids):
         album = s.get("album") or s.get("al") or {}
         out[s["id"]] = {
             "cover": album.get("picUrl") or "",
-            "year": _year(s.get("publishTime") or album.get("publishTime")),
+            "ts": s.get("publishTime") or album.get("publishTime") or 0,
         }
     return out
 
 
 def fetch_radio(radio_id):
-    """Return {name, url, episodes:[{title, url, cover, subtitle}]} for a dj radio."""
+    """Return {name, url, episodes:[...]} for a dj radio, episodes newest first."""
     detail = _get(f"https://music.163.com/api/djradio/get?id={radio_id}")
     info = detail.get("djRadio") or {}
     progs = _get(
@@ -104,19 +116,20 @@ def fetch_radio(radio_id):
     episodes = []
     for p in progs:
         cover = p.get("coverUrl") or ((p.get("mainSong") or {}).get("album") or {}).get("picUrl") or ""
-        subtitle = " · ".join(b for b in (_year(p.get("createTime")), "radio") if b)
+        ts = p.get("createTime") or 0
         episodes.append(
             {
                 "title": p["name"],
                 "url": f"https://music.163.com/program?id={p['id']}",
                 "cover": _sized(cover),
-                "subtitle": subtitle,
+                "subtitle": _date(ts),
+                "_ts": ts,
             }
         )
     return {
         "name": info.get("name") or "Radio",
         "url": f"https://music.163.com/djradio?id={radio_id}",
-        "episodes": episodes,
+        "episodes": _by_time_desc(episodes),
     }
 
 
