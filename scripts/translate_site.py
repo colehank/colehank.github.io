@@ -1,22 +1,16 @@
 #!/usr/bin/env python3
-"""Post-build translator: generate a Simplified-Chinese /zh/ copy of _site.
+"""Post-build translator: generate a light Chinese /zh/ copy of _site.
 
-Runs in CI AFTER `jekyll build`. For every HTML page under _site it:
-  - translates the visible text (and <title>) to Chinese via an OpenAI-compatible
-    chat API (batched + cached),
-  - rewrites internal page links to stay under /zh/,
-  - injects a language toggle (中文 / EN) into the navbar,
-  - writes the result to _site/zh/<same path>.
-The English pages get the same toggle (pointing at the /zh/ copy).
+Runs in CI AFTER `jekyll build`. Scope (intentionally small):
+  - every page's <title> (browser-tab name) and navbar tab labels are translated,
+  - the about page (index.html) body is translated in full,
+  - all OTHER page bodies are left in English.
+Each /zh/ page also gets internal links rewritten under /zh/ and a 中文/EN toggle.
 
-Fully fail-safe: any error (missing key, API failure, parse error) leaves the
-English site untouched and exits 0, so the site always deploys.
+Fully fail-safe: any error leaves the English site untouched and exits 0.
 
-Env:
-  TRANSLATE_API_KEY   OpenAI-compatible API key (required; skip if missing)
-  TRANSLATE_BASE_URL  e.g. https://www.dmxapi.cn/v1
-  TRANSLATE_MODEL     e.g. gpt-4o
-  TRANSLATE_CACHE     path to a JSON translation cache (default .translate-cache.json)
+Env: TRANSLATE_API_KEY, TRANSLATE_BASE_URL, TRANSLATE_MODEL, TRANSLATE_CACHE,
+     TRANSLATE_WORKERS
 """
 
 import json
@@ -34,6 +28,21 @@ CACHE_PATH = os.environ.get("TRANSLATE_CACHE", ".translate-cache.json")
 SKIP_TAGS = {"script", "style", "code", "pre", "kbd", "samp", "tt", "noscript", "svg"}
 ASSET_EXTS = (".pdf", ".xml", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
               ".json", ".ico", ".css", ".js", ".woff", ".woff2", ".ttf", ".zip")
+
+GLOSSARY = (
+    "Apply this glossary exactly: 'Guohao Zhang' -> '张国浩'; "
+    "'Department of Psychology' -> '心理学部'; 'agent'/'agents' -> '智能体'; "
+    "'muses' -> '灵感'. "
+)
+
+# Navbar tab labels use a fixed map (short ambiguous words translate poorly).
+NAV_MAP = {
+    "about": "关于",
+    "publications": "出版物",
+    "CV": "简历",
+    "news": "新闻",
+    "muses": "灵感",
+}
 
 
 def log(m):
@@ -57,14 +66,13 @@ def save_cache(cache):
 
 
 def translate_batch(texts):
-    """Translate a list of strings to Chinese; returns a same-length list."""
     prompt = (
         "You are a professional translator for an academic personal website. "
         "Translate each item in the following JSON array from English to Simplified "
-        "Chinese. Keep proper nouns, people's names, institution names, technical "
-        "terms/acronyms (e.g. NeuroAI, fMRI, MEG, EEG, LLM, DOI, PhD, MSc, BSc), URLs, "
-        "emails, code and numbers unchanged. Preserve leading/trailing spaces and "
-        "punctuation. Return ONLY a JSON array of the same length, same order, no prose.\n\n"
+        "Chinese. Keep people's names, institution names, technical terms/acronyms "
+        "(NeuroAI, fMRI, MEG, EEG, LLM, DOI, PhD, MSc, BSc), URLs, emails, code and "
+        "numbers unchanged. Preserve leading/trailing spaces and punctuation. " + GLOSSARY
+        + "Return ONLY a JSON array of the same length and order, no prose.\n\n"
         + json.dumps(texts, ensure_ascii=False)
     )
     body = json.dumps({
@@ -84,12 +92,11 @@ def translate_batch(texts):
         content = content.split("```")[1].lstrip("json").strip()
     out = json.loads(content)
     if not isinstance(out, list) or len(out) != len(texts):
-        raise ValueError(f"bad batch response ({len(out) if isinstance(out, list) else '?'} != {len(texts)})")
+        raise ValueError("bad batch response length")
     return [str(x) for x in out]
 
 
 def translate_all(strings, cache):
-    """Translate unique strings concurrently (I/O-bound API calls)."""
     from concurrent.futures import ThreadPoolExecutor
 
     todo = [s for s in strings if s not in cache]
@@ -106,58 +113,85 @@ def translate_all(strings, cache):
                 log(f"chunk attempt {attempt + 1} failed: {e}")
                 if attempt < 2:
                     time.sleep(2)
-        return {s: s for s in chunk}  # give up -> keep English
+        return {s: s for s in chunk}
 
     if chunks:
         with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-            for res in ex.map(do, chunks):  # merged in the main thread
+            for res in ex.map(do, chunks):
                 cache.update(res)
     return cache
 
 
-def translatable_strings(soup):
-    from bs4 import NavigableString, Comment
+def _text_nodes(scope, Comment):
+    """Translatable text nodes within a scope element/soup."""
     out = []
-    for node in soup.find_all(string=True):
+    for node in scope.find_all(string=True):
         if isinstance(node, Comment):
             continue
-        parent = node.parent.name if node.parent else ""
-        if parent in SKIP_TAGS:
+        if node.parent and node.parent.name in SKIP_TAGS:
             continue
         if node.parent and node.parent.get("translate") == "no":
             continue
         if node.parent and "MathJax" in " ".join(node.parent.get("class", [])):
             continue
-        text = str(node)
-        if text.strip() and not text.strip().isdigit():
-            out.append(text)
+        if str(node).strip() and not str(node).strip().isdigit():
+            out.append(node)
     return out
 
 
-def rewrite_links(soup, to_zh):
+def target_nodes(soup, is_about):
+    """Nodes to API-translate: <title>, and (about only) the body. Nav labels
+    are handled separately via NAV_MAP."""
+    from bs4 import Comment
+    nodes = []
+    title = soup.find("title")
+    if title and title.string and title.string.strip():
+        nodes.append(title.string)
+    if is_about:
+        body = soup.find("article") or soup.find("body") or soup
+        nodes += _text_nodes(body, Comment)
+    # de-dupe by object identity, preserve order
+    seen, uniq = set(), []
+    for n in nodes:
+        if id(n) not in seen:
+            seen.add(id(n))
+            uniq.append(n)
+    return uniq
+
+
+def rewrite_links(soup):
     for a in soup.find_all("a", href=True):
         href = a["href"]
-        if to_zh:
-            if (href.startswith("/") and not href.startswith("/zh/")
-                    and not href.startswith("/assets/")
-                    and not href.lower().endswith(ASSET_EXTS)):
-                a["href"] = "/zh" + ("" if href == "/" else href) if href != "/" else "/zh/"
-    # normalise "/" -> "/zh/"
-    for a in soup.find_all("a", href=True):
-        if a["href"] == "/zh":
+        if href == "/":
             a["href"] = "/zh/"
+        elif (href.startswith("/") and not href.startswith("/zh/")
+              and not href.startswith("/assets/")
+              and not href.lower().endswith(ASSET_EXTS)):
+            a["href"] = "/zh" + href
 
 
-def inject_toggle(soup, target_href, label):
+def apply_nav_map(soup):
+    from bs4 import NavigableString
     ul = soup.find("ul", class_="navbar-nav")
     if not ul:
         return
+    for a in ul.find_all("a", class_="nav-link"):
+        for node in list(a.find_all(string=True)):
+            key = str(node).strip()
+            if key in NAV_MAP:
+                node.replace_with(NavigableString(str(node).replace(key, NAV_MAP[key])))
+
+
+def inject_toggle(soup, target_href, label):
     from bs4 import BeautifulSoup as BS
-    li = BS(
-        f'<li class="nav-item"><a class="nav-link" href="{target_href}">{label}</a></li>',
-        "html.parser",
-    )
-    ul.append(li)
+    ul = soup.find("ul", class_="navbar-nav")
+    if not ul:
+        return
+    # idempotent: drop any pre-existing 中文/EN toggle first
+    for a in ul.find_all("a", class_="nav-link"):
+        if a.get_text(strip=True) in ("中文", "EN"):
+            (a.find_parent("li") or a).decompose()
+    ul.append(BS(f'<li class="nav-item"><a class="nav-link" href="{target_href}">{label}</a></li>', "html.parser"))
 
 
 def main():
@@ -165,73 +199,51 @@ def main():
         log("no TRANSLATE_API_KEY set — skipping /zh generation")
         return 0
     try:
-        from bs4 import BeautifulSoup
+        from bs4 import BeautifulSoup, NavigableString
     except Exception as e:
         log(f"beautifulsoup not available: {e}")
         return 0
 
     import pathlib
     root = pathlib.Path(SITE)
-    pages = []
+    cache = load_cache()
+
+    parsed, all_strings = [], set()
     for p in root.rglob("*.html"):
         rel = p.relative_to(root).as_posix()
         if rel.startswith("assets/") or rel.startswith("zh/") or rel == "404.html":
             continue
         html = p.read_text(encoding="utf-8", errors="ignore")
         if 'http-equiv="refresh"' in html.lower():
-            continue  # redirect stub
-        pages.append((p, rel, html))
-    log(f"{len(pages)} pages to translate")
-
-    cache = load_cache()
-    # gather all strings first (one big translate pass -> better batching/caching)
-    all_strings = set()
-    parsed = []
-    for p, rel, html in pages:
+            continue
+        is_about = rel == "index.html"
         soup = BeautifulSoup(html, "html.parser")
-        strings = translatable_strings(soup)
-        title = soup.find("title")
-        if title and title.string and title.string.strip():
-            strings.append(str(title.string))
-        all_strings.update(strings)
-        parsed.append((p, rel, soup))
+        nodes = target_nodes(soup, is_about)
+        all_strings.update(str(n) for n in nodes)
+        parsed.append((p, rel, soup, nodes))
+    log(f"{len(parsed)} pages; translating titles + nav labels + the about body")
+
     translate_all(sorted(all_strings), cache)
     save_cache(cache)
+    tr = lambda s: cache.get(s, s)
 
-    def tr(s):
-        return cache.get(s, s)
-
-    from bs4 import NavigableString, Comment
     count = 0
-    for p, rel, soup in parsed:
-        # english page: add a "中文" toggle pointing at the zh copy
+    for p, rel, soup, nodes in parsed:
+        # English page: just add a 中文 toggle to the /zh/ copy
         en_soup = BeautifulSoup(str(soup), "html.parser")
-        zh_path = "/zh/" if rel == "index.html" else "/zh/" + rel.replace("index.html", "")
-        inject_toggle(en_soup, zh_path, "中文")
+        zh_href = "/zh/" if rel == "index.html" else "/zh/" + rel.replace("index.html", "")
+        inject_toggle(en_soup, zh_href, "中文")
         p.write_text(str(en_soup), encoding="utf-8")
 
-        # chinese page
-        for node in soup.find_all(string=True):
-            if isinstance(node, Comment):
-                continue
-            parent = node.parent.name if node.parent else ""
-            if parent in SKIP_TAGS:
-                continue
-            if node.parent and node.parent.get("translate") == "no":
-                continue
-            if node.parent and "MathJax" in " ".join(node.parent.get("class", [])):
-                continue
-            t = str(node)
-            if t.strip() and not t.strip().isdigit():
-                node.replace_with(NavigableString(tr(t)))
-        title = soup.find("title")
-        if title and title.string and title.string.strip():
-            title.string.replace_with(tr(str(title.string)))
-        soup.html["lang"] = "zh-CN" if soup.html else None
-        rewrite_links(soup, to_zh=True)
-        en_path = "/" if rel == "index.html" else "/" + rel.replace("index.html", "")
-        inject_toggle(soup, en_path, "EN")
-
+        # Chinese page: translate only the target nodes, keep the rest as-is
+        for n in nodes:
+            n.replace_with(NavigableString(tr(str(n))))
+        apply_nav_map(soup)
+        if soup.html:
+            soup.html["lang"] = "zh-CN"
+        rewrite_links(soup)
+        en_href = "/" if rel == "index.html" else "/" + rel.replace("index.html", "")
+        inject_toggle(soup, en_href, "EN")
         out = root / "zh" / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(str(soup), encoding="utf-8")
@@ -243,6 +255,6 @@ def main():
 if __name__ == "__main__":
     try:
         sys.exit(main())
-    except Exception as e:  # never break the deploy
+    except Exception as e:
         log(f"FAILED (site left English-only): {e}")
         sys.exit(0)
