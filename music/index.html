@@ -80,6 +80,16 @@
     bar.addEventListener("pointercancel", endDrag);
   })();
 </script> <style>
+  /* Show the site's oyster mark next to the "muses" page title */
+  .post-title::after {
+    content: "";
+    display: inline-block;
+    width: 1.7em;
+    height: 1.1em;
+    margin-left: 0.35em;
+    vertical-align: -0.12em;
+    background: url("/assets/img/oyster-mark.png") center / contain no-repeat;
+  }
   .music-intro {
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
