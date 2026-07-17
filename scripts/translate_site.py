@@ -134,22 +134,26 @@ def _text_nodes(scope, Comment):
             continue
         if node.parent and "MathJax" in " ".join(node.parent.get("class", [])):
             continue
-        if str(node).strip() and not str(node).strip().isdigit():
+        s = str(node).strip()
+        if s in ("Guohao", "Zhang", "Guohao Zhang"):
+            continue  # name is handled by fix_name, not the API (avoids mistranslation)
+        if s and not s.isdigit():
             out.append(node)
     return out
 
 
-def target_nodes(soup, is_about):
-    """Nodes to API-translate: <title>, each page's big title + subtitle, and
-    (about only) the full body. Nav labels use NAV_MAP; the name uses fix_name."""
+def target_nodes(soup, full):
+    """Nodes to API-translate: <title>; each page's big title + subtitle; and for
+    'full' pages (about, news) the whole .post block (header + article).
+    Nav labels use NAV_MAP; the name uses fix_name."""
     from bs4 import Comment
     nodes = []
     title = soup.find("title")
     if title and title.string and title.string.strip():
         nodes.append(title.string)
-    if is_about:
-        body = soup.find("article") or soup.find("body") or soup
-        nodes += _text_nodes(body, Comment)
+    if full:
+        scope = soup.find(class_="post") or soup.find("article") or soup.find("body") or soup
+        nodes += _text_nodes(scope, Comment)
     else:
         for cls in ("post-title", "post-description", "music-intro"):
             for el in soup.find_all(class_=cls):
@@ -237,9 +241,9 @@ def main():
         html = p.read_text(encoding="utf-8", errors="ignore")
         if 'http-equiv="refresh"' in html.lower():
             continue
-        is_about = rel == "index.html"
+        full = rel in ("index.html", "news/index.html")
         soup = BeautifulSoup(html, "html.parser")
-        nodes = target_nodes(soup, is_about)
+        nodes = target_nodes(soup, full)
         all_strings.update(str(n) for n in nodes)
         parsed.append((p, rel, soup, nodes))
     log(f"{len(parsed)} pages; translating titles + nav labels + the about body")
