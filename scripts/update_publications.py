@@ -39,6 +39,7 @@ N_SELECTED = 3                       # newest N papers flagged selected={true}
 # entry here always overrides the auto-fetched one.
 PREVIEWS = {
     "10.1038/s41597-025-05174-7": "nod_meeg.png",
+    # Set a DOI to None here if you ever want a paper shown without a thumbnail.
 }
 PREVIEW_DIR = "assets/img/publication_preview"
 AUTO_PREVIEW = True  # set False to disable automatic og:image thumbnails
@@ -46,6 +47,7 @@ AUTO_PREVIEW = True  # set False to disable automatic og:image thumbnails
 
 ORCID_API = f"https://pub.orcid.org/v3.0/{ORCID_ID}/works"
 OPENALEX = "https://api.openalex.org/works/doi:"
+CROSSREF = "https://api.crossref.org/works/"
 BROWSER_UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
@@ -61,17 +63,27 @@ def _get_json(url: str, accept: str = "application/json") -> dict:
         return json.load(resp)
 
 
-def fetch_orcid_dois() -> list[str]:
+def fetch_orcid_dois() -> list[tuple[str, str]]:
+    """Return [(doi, orcid_work_type), ...] for every work claimed on ORCID.
+
+    ORCID's work type is author-curated, so it is more trustworthy than
+    OpenAlex's guess (which labels Springer LNCS conference papers as
+    "book-chapter"). We use it to pick @inproceedings vs @article.
+    """
     data = _get_json(ORCID_API)
-    dois: list[str] = []
+    out: list[tuple[str, str]] = []
+    seen: set[str] = set()
     for group in data.get("group", []):
+        summaries = group.get("work-summary") or [{}]
+        wtype = (summaries[0].get("type") or "").strip().lower()
         for eid in group.get("external-ids", {}).get("external-id", []):
             if (eid.get("external-id-type") or "").lower() == "doi":
                 val = (eid.get("external-id-value") or "").strip().lower()
                 val = val.replace("https://doi.org/", "").replace("http://doi.org/", "")
-                if val and val not in dois:
-                    dois.append(val)
-    return dois
+                if val and val not in seen:
+                    seen.add(val)
+                    out.append((val, wtype))
+    return out
 
 
 def fetch_openalex_by_doi(doi: str) -> dict | None:
@@ -80,6 +92,17 @@ def fetch_openalex_by_doi(doi: str) -> dict | None:
         return _get_json(url)
     except Exception as exc:  # noqa: BLE001
         print(f"  ! OpenAlex lookup failed for {doi}: {exc}", file=sys.stderr)
+        return None
+
+
+def fetch_crossref_by_doi(doi: str) -> dict | None:
+    """Publisher-deposited metadata. Used for the venue name because OpenAlex
+    lowercases it ("Lecture notes in computer science") and has no abbreviation."""
+    url = CROSSREF + urllib.parse.quote(doi, safe="")
+    try:
+        return (_get_json(url) or {}).get("message")
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! Crossref lookup failed for {doi}: {exc}", file=sys.stderr)
         return None
 
 
@@ -128,7 +151,19 @@ def make_key(work: dict, seen: set[str]) -> str:
     return key
 
 
-def venue(work: dict) -> tuple[str, str]:
+def venue(work: dict, cr: dict | None = None) -> tuple[str, str]:
+    """Return (venue name, abbreviation), preferring Crossref over OpenAlex.
+
+    Crossref keeps the publisher's own capitalisation and, for Springer book
+    chapters, lists the series first and the specific proceedings volume last
+    (["Lecture Notes in Computer Science", "Cross-Cultural Design"]) — the last
+    entry is the more informative one.
+    """
+    if cr:
+        titles = [clean(t) for t in (cr.get("container-title") or []) if clean(t)]
+        shorts = [clean(t) for t in (cr.get("short-container-title") or []) if clean(t)]
+        if titles:
+            return titles[-1], (shorts[-1] if shorts else "")
     src = (work.get("primary_location") or {}).get("source") or {}
     return clean(src.get("display_name") or ""), clean(src.get("abbreviated_title") or "")
 
@@ -192,12 +227,19 @@ def fetch_preview(work: dict, doi: str, key: str) -> str:
     return fname
 
 
-def format_entry(work: dict, key: str, selected: bool, preview: str = "") -> str:
-    etype = "inproceedings" if work.get("type") == "proceedings-article" else "article"
+def format_entry(work: dict, key: str, selected: bool, preview: str = "", orcid_type: str = "",
+                 cr: dict | None = None) -> str:
+    # Trust ORCID's author-curated type first; fall back to OpenAlex's guess.
+    if orcid_type in ("conference-paper", "conference-abstract", "conference-poster"):
+        etype = "inproceedings"
+    elif orcid_type == "journal-article":
+        etype = "article"
+    else:
+        etype = "inproceedings" if work.get("type") == "proceedings-article" else "article"
     title = clean(work.get("title") or work.get("display_name") or "")
     authors = to_bibtex_authors(work.get("authorships") or [])
     year = work.get("publication_year") or ""
-    name, abbr = venue(work)
+    name, abbr = venue(work, cr)
     biblio = work.get("biblio") or {}
     doi = (work.get("doi") or "").replace("https://doi.org/", "")
     landing = (work.get("primary_location") or {}).get("landing_page_url") or ""
@@ -244,12 +286,17 @@ def main() -> int:
         print("No DOIs on ORCID; leaving papers.bib untouched.", file=sys.stderr)
         return 0
 
+    orcid_types = {doi: wtype for doi, wtype in dois}
+    crossref: dict[str, dict] = {}
     works = []
-    for doi in dois:
+    for doi, _wtype in dois:
         w = fetch_openalex_by_doi(doi)
         if w and (w.get("title") or w.get("display_name")):
             works.append(w)
-        time.sleep(0.2)  # be polite to the API
+            cr = fetch_crossref_by_doi(doi)
+            if cr:
+                crossref[doi] = cr
+        time.sleep(0.2)  # be polite to the APIs
 
     if not works:
         print("No metadata resolved; leaving papers.bib untouched.", file=sys.stderr)
@@ -261,8 +308,15 @@ def main() -> int:
     for i, w in enumerate(works):
         key = make_key(w, seen)
         doi = (w.get("doi") or "").replace("https://doi.org/", "").lower()
-        preview = PREVIEWS.get(doi) or fetch_preview(w, doi, key)
-        entries.append(format_entry(w, key, selected=i < N_SELECTED, preview=preview))
+        # An explicit entry in PREVIEWS always wins; None/"" means "no thumbnail".
+        if doi in PREVIEWS:
+            preview = PREVIEWS[doi] or ""
+        else:
+            preview = fetch_preview(w, doi, key)
+        entries.append(
+            format_entry(w, key, selected=i < N_SELECTED, preview=preview,
+                         orcid_type=orcid_types.get(doi, ""), cr=crossref.get(doi))
+        )
 
     out = "---\n---\n\n" + "\n\n".join(entries) + "\n"
     with open(BIB_PATH, "w", encoding="utf-8") as f:
