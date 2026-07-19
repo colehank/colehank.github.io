@@ -122,6 +122,61 @@ def reconstruct_abstract(inv_index: dict | None) -> str:
     return " ".join(w for _, w in positions)
 
 
+def _strip_tags(text: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = (text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+                .replace("&quot;", '"').replace("&#39;", "'").replace("&nbsp;", " "))
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def abstract_from_landing(html: str) -> str:
+    """Publishers put the abstract on the (free) landing page even when the
+    metadata APIs don't carry it. Springer uses <section id="Abs1">; most others
+    expose a dc.description meta tag."""
+    if not html:
+        return ""
+    # Springer marks the section with aria-labelledby/data-title rather than id=;
+    # other publishers use a plain id or an "abstract" class.
+    section_pats = (
+        r'<section[^>]*(?:aria-labelledby|id)="Abs\d*"[^>]*>(.*?)</section>',
+        r'<section[^>]*data-title="Abstract"[^>]*>(.*?)</section>',
+        r'<div[^>]*class="[^"]*\babstract\b[^"]*"[^>]*>(.*?)</div>\s*</div>',
+    )
+    for pat in section_pats:
+        m = re.search(pat, html, re.S | re.I)
+        if m:
+            txt = _strip_tags(m.group(1))
+            txt = re.sub(r"^Abstract\b[:\s]*", "", txt, flags=re.I)
+            if len(txt) > 100:
+                return txt
+    for pat in (r'<meta[^>]+name="dc\.description"[^>]+content="([^"]+)"',
+                r'<meta[^>]+name="citation_abstract"[^>]+content="([^"]+)"'):
+        m = re.search(pat, html, re.I)
+        if m:
+            txt = _strip_tags(m.group(1))
+            # Skip search-engine snippets, which are cut off mid-sentence.
+            if len(txt) > 100 and not txt.endswith("..."):
+                return txt
+    return ""
+
+
+def resolve_abstract(work: dict, doi: str, cr: dict | None) -> str:
+    """OpenAlex -> Crossref -> publisher landing page."""
+    txt = clean(reconstruct_abstract(work.get("abstract_inverted_index")))
+    if txt:
+        return txt
+    if cr and cr.get("abstract"):
+        txt = _strip_tags(cr["abstract"])  # Crossref stores JATS XML
+        txt = re.sub(r"^Abstract\b[:\s]*", "", txt, flags=re.I)
+        if txt:
+            print(f"  + abstract from Crossref for {doi}")
+            return txt
+    txt = abstract_from_landing(get_landing_html(landing_url(work, doi)))
+    if txt:
+        print(f"  + abstract from publisher page for {doi}")
+    return txt
+
+
 def to_bibtex_authors(authorships: list[dict]) -> str:
     names = []
     for a in authorships:
@@ -185,6 +240,30 @@ def _extract_og_image(html: str) -> str:
     return ""
 
 
+_LANDING_CACHE: dict[str, str] = {}
+
+
+def landing_url(work: dict, doi: str) -> str:
+    return (work.get("primary_location") or {}).get("landing_page_url") \
+        or f"https://doi.org/{doi}"
+
+
+def get_landing_html(url: str) -> str:
+    """Fetch (and memoise) a publisher landing page — used for both the
+    thumbnail and, when the APIs have none, the abstract."""
+    if url in _LANDING_CACHE:
+        return _LANDING_CACHE[url]
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": BROWSER_UA})
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            html = resp.read(1_000_000).decode("utf-8", "ignore")
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! landing page fetch failed for {url}: {exc}", file=sys.stderr)
+        html = ""
+    _LANDING_CACHE[url] = html
+    return html
+
+
 def fetch_preview(work: dict, doi: str, key: str) -> str:
     """Download the publisher's og:image as a thumbnail. Returns a filename in
     PREVIEW_DIR, or "" if none could be fetched. Existing files are reused so the
@@ -197,12 +276,10 @@ def fetch_preview(work: dict, doi: str, key: str) -> str:
             if existing.startswith(f"{key}."):
                 return existing
 
-    landing = (work.get("primary_location") or {}).get("landing_page_url") \
-        or f"https://doi.org/{doi}"
+    html = get_landing_html(landing_url(work, doi))
+    if not html:
+        return ""
     try:
-        req = urllib.request.Request(landing, headers={"User-Agent": BROWSER_UA})
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            html = resp.read(1_000_000).decode("utf-8", "ignore")
         img_url = _extract_og_image(html)
         if not img_url:
             return ""
@@ -248,7 +325,7 @@ def format_entry(work: dict, key: str, selected: bool, preview: str = "", orcid_
     biblio = work.get("biblio") or {}
     doi = (work.get("doi") or "").replace("https://doi.org/", "")
     landing = (work.get("primary_location") or {}).get("landing_page_url") or ""
-    abstract = clean(reconstruct_abstract(work.get("abstract_inverted_index")))
+    abstract = clean(resolve_abstract(work, doi.lower(), cr))
 
     lines = [f"@{etype}{{{key},"]
     if abbr and SHOW_VENUE_ABBR:
