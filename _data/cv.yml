@@ -12,7 +12,7 @@ cv:
     - network: ORCID
       username: 0009-0008-5892-6961
     - network: Google Scholar
-      username: oLhYDMYAAAAJ
+      username: jyKvqtoAAAAJ
   sections:
     Summary:
       - bullet: PhD student in Psychology at Beijing Normal University, working at the intersection of human vision, large-scale neuroimaging (fMRI/MEG/EEG), and NeuroAI. Also interested in LLM-based agent memory and decentralized science.
