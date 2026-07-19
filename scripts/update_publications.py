@@ -43,6 +43,11 @@ PREVIEWS = {
 }
 PREVIEW_DIR = "assets/img/publication_preview"
 AUTO_PREVIEW = True  # set False to disable automatic og:image thumbnails
+
+# al-folio renders `abbr` as a coloured badge that shares the left column with the
+# thumbnail, which crowds it — and only some venues have a short name, so entries
+# end up looking inconsistent. Flip to True if you want the badges back.
+SHOW_VENUE_ABBR = False
 # -----------------------------------------------------------------------------
 
 ORCID_API = f"https://pub.orcid.org/v3.0/{ORCID_ID}/works"
@@ -246,7 +251,7 @@ def format_entry(work: dict, key: str, selected: bool, preview: str = "", orcid_
     abstract = clean(reconstruct_abstract(work.get("abstract_inverted_index")))
 
     lines = [f"@{etype}{{{key},"]
-    if abbr:
+    if abbr and SHOW_VENUE_ABBR:
         lines.append(f"  abbr={{{abbr}}},")
     lines.append("  bibtex_show={true},")
     lines.append(f"  title={{{title}}},")
