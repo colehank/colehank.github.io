@@ -215,6 +215,11 @@ kramdown:
 # Includes & excludes
 include: ["_pages"]
 exclude:
+  # Repo tooling — must not be copied into _site and served publicly.
+  - AGENTS.md
+  - CLAUDE.md
+  - requirements.txt
+  - scripts/ # run from the CI checkout, never needed in the built site
   - al-folio-upgrade-report.md
   - bin/
   - CONTRIBUTING.md
