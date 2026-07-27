@@ -121,3 +121,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _site
+          # gh-pages holds generated output only, so its history has no value.
+          # Without this every deploy stacks another full copy of the site onto
+          # the branch, which is what made a fresh clone pull down ~50M.
+          single-commit: true
