@@ -26,27 +26,11 @@ Hi! I'm Guohao Zhang, a PhD student in the Department of Psychology at Beijing N
 Before that, I earned my MSc in Psychology at Beijing Normal University (2022–2025) and my BSc at Southwest University of Science and Technology (2018–2022). Along the way I helped build NOD and HAD, two large-scale fMRI/MEG/EEG datasets of the brain responding to thousands of naturalistic images and video clips — resources for studying how we recognize visual content in the messy, real world.
 
 My research lives at the intersection of brains and machines. I study how the human visual system represents the natural world with large-scale neuroimaging, and I'm increasingly drawn to **NeuroAI** — asking what artificial and biological intelligence can teach each other. Lately I've been thinking a lot about giving language-model **agents** a more human-like **memory**, and about **decentralized science** as a way to make research more open, reproducible, and collaborative.
+
+<!-- Navbar/social-icon styling is site-wide; see `footer_text` in _config.yml.
+     This page sets `selected_papers: false`, so it renders no bibliography. -->
+
 <style>
-/* Make the NetEase custom social icon match the Font Awesome icons:
-   single-colour (follows theme colour + hover) and vertically aligned. */
-a[title="NetEase Cloud Music"] svg {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.41em;
-  background-color: var(--global-text-color);
-  -webkit-mask: url("/assets/img/netease.svg") center / contain no-repeat;
-  mask: url("/assets/img/netease.svg") center / contain no-repeat;
-}
-a[title="NetEase Cloud Music"]:hover svg { background-color: var(--global-theme-color); }
-a[title="NetEase Cloud Music"] svg image { display: none; }
-/* Hide the RSS feed icon */
-a[title="Rss icon"] { display: none !important; }
-/* Thumbnail matches the text block height exactly. Absolute positioning keeps a
-   tall image (e.g. a portrait book cover) from stretching the whole row. */
-.bibliography li .row { align-items: stretch !important; }
-.bibliography li .col-sm-2.abbr { position: relative !important; display: block !important; margin-bottom: 0 !important; padding: 0 8px !important; }
-.bibliography li .col-sm-2.abbr figure { position: absolute !important; top: 0 !important; bottom: 0 !important; left: 8px !important; right: 8px !important; margin: 0 !important; width: auto !important; height: auto !important; }
-.bibliography li .col-sm-2.abbr img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 6px !important; }
 /* Keep the header text clear of the avatar column (desktop only) */
 @media (min-width: 768px) {
   .post-header { padding-right: calc(30% + 1.5rem); }
@@ -59,20 +43,44 @@ a[title="Rss icon"] { display: none !important; }
 
 <script>
   // Lift the avatar so its top edge lines up with the "Guohao Zhang" title.
+  // The offset can only be measured after layout, so this runs in JS. It is
+  // deliberately NOT bound to `load`: waiting for the avatar image to finish
+  // downloading is what used to make the avatar visibly jump on first paint.
+  // ResizeObserver catches the image settling; rAF coalesces bursts of events.
   (function () {
-    function alignAvatar() {
+    var pending = null;
+
+    function align() {
+      pending = null;
       var header = document.querySelector(".post-header");
       var profile = document.querySelector(".profile.float-right");
       if (!header || !profile) return;
+      if (window.innerWidth < 768) {
+        profile.style.marginTop = ""; // avatar stacks on small screens
+        return;
+      }
       profile.style.marginTop = "0px"; // reset before measuring
-      if (window.innerWidth < 768) return; // avatar stacks on small screens
       var delta = profile.getBoundingClientRect().top - header.getBoundingClientRect().top;
-      var cur = parseFloat(getComputedStyle(profile).marginTop) || 0;
-      profile.style.marginTop = cur - delta + "px";
+      profile.style.marginTop = -delta + "px";
     }
-    window.addEventListener("load", alignAvatar);
-    window.addEventListener("resize", alignAvatar);
-    alignAvatar();
+
+    function schedule() {
+      if (pending === null) pending = requestAnimationFrame(align);
+    }
+
+    function start() {
+      schedule();
+      window.addEventListener("resize", schedule);
+      var profile = document.querySelector(".profile.float-right");
+      var header = document.querySelector(".post-header");
+      if (window.ResizeObserver && profile && header) {
+        var ro = new ResizeObserver(schedule);
+        ro.observe(profile);
+        ro.observe(header);
+      }
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+    else start();
   })();
 </script>
-

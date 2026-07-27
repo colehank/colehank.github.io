@@ -19,18 +19,9 @@ nav_order: 2
 
 </div>
 
+<!-- Navbar/social-icon styling is site-wide; see `footer_text` in _config.yml. -->
+
 <style>
-/* Match the NetEase custom social icon to the Font Awesome navbar icons. */
-a[title="NetEase Cloud Music"] svg {
-  width: 1em; height: 1em; vertical-align: -0.41em;
-  background-color: var(--global-text-color);
-  -webkit-mask: url("/assets/img/netease.svg") center / contain no-repeat;
-  mask: url("/assets/img/netease.svg") center / contain no-repeat;
-}
-a[title="NetEase Cloud Music"]:hover svg { background-color: var(--global-theme-color); }
-a[title="NetEase Cloud Music"] svg image { display: none; }
-/* Hide the RSS feed icon */
-a[title="Rss icon"] { display: none !important; }
 /* Thumbnail matches the text block height exactly. Absolute positioning keeps a
    tall image (e.g. a portrait book cover) from stretching the whole row. */
 .bibliography li .row { align-items: stretch !important; }

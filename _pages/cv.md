@@ -11,22 +11,5 @@ toc:
   sidebar: left
 ---
 
-<style>
-/* Match the NetEase custom social icon to the Font Awesome navbar icons. */
-a[title="NetEase Cloud Music"] svg {
-  width: 1em; height: 1em; vertical-align: -0.41em;
-  background-color: var(--global-text-color);
-  -webkit-mask: url("/assets/img/netease.svg") center / contain no-repeat;
-  mask: url("/assets/img/netease.svg") center / contain no-repeat;
-}
-a[title="NetEase Cloud Music"]:hover svg { background-color: var(--global-theme-color); }
-a[title="NetEase Cloud Music"] svg image { display: none; }
-/* Hide the RSS feed icon */
-a[title="Rss icon"] { display: none !important; }
-/* Thumbnail matches the text block height exactly. Absolute positioning keeps a
-   tall image (e.g. a portrait book cover) from stretching the whole row. */
-.bibliography li .row { align-items: stretch !important; }
-.bibliography li .col-sm-2.abbr { position: relative !important; display: block !important; margin-bottom: 0 !important; padding: 0 8px !important; }
-.bibliography li .col-sm-2.abbr figure { position: absolute !important; top: 0 !important; bottom: 0 !important; left: 8px !important; right: 8px !important; margin: 0 !important; width: auto !important; height: auto !important; }
-.bibliography li .col-sm-2.abbr img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 6px !important; }
-</style>
+<!-- No page-local CSS needed here: navbar/social-icon styling is site-wide
+     (see `footer_text` in _config.yml), and this page renders no bibliography. -->

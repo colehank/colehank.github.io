@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-Our paper *A large-scale MEG and EEG dataset for object recognition in naturalistic scenes* is published in **Scientific Data**. :tada:
+Our paper _A large-scale MEG and EEG dataset for object recognition in naturalistic scenes_ is published in **Scientific Data**. :tada:

@@ -17,19 +17,16 @@ on:
       - "**.yml"
       - "Gemfile"
       - "Gemfile.lock"
-      - "!.github/workflows/axe.yml"
-      - "!.github/workflows/broken-links.yml"
-      - "!.github/workflows/deploy-docker-tag.yml"
-      - "!.github/workflows/deploy-image.yml"
-      - "!.github/workflows/docker-slim.yml"
-      - "!.github/workflows/lighthouse-badger.yml"
-      - "!.github/workflows/prettier.yml"
-      - "!lighthouse_results/**"
-      - "!docs/CONTRIBUTING.md"
-      - "!docs/CUSTOMIZE.md"
-      - "!docs/FAQ.md"
-      - "!docs/INSTALL.md"
+      # Docs and sibling workflows are excluded from the Jekyll build,
+      # so changing them should not trigger a deploy.
+      - "!.github/workflows/render-cv.yml"
+      - "!.github/workflows/update-citations.yml"
+      - "!.github/workflows/update-music.yml"
+      - "!.github/workflows/update-publications.yml"
+      - "!docs/**"
       - "!README.md"
+      - "!AGENTS.md"
+      - "!CLAUDE.md"
   pull_request:
     branches:
       - master
@@ -46,19 +43,16 @@ on:
       - "**.yml"
       - "Gemfile"
       - "Gemfile.lock"
-      - "!.github/workflows/axe.yml"
-      - "!.github/workflows/broken-links.yml"
-      - "!.github/workflows/deploy-docker-tag.yml"
-      - "!.github/workflows/deploy-image.yml"
-      - "!.github/workflows/docker-slim.yml"
-      - "!.github/workflows/lighthouse-badger.yml"
-      - "!.github/workflows/prettier.yml"
-      - "!lighthouse_results/**"
-      - "!docs/CONTRIBUTING.md"
-      - "!docs/CUSTOMIZE.md"
-      - "!docs/FAQ.md"
-      - "!docs/INSTALL.md"
+      # Docs and sibling workflows are excluded from the Jekyll build,
+      # so changing them should not trigger a deploy.
+      - "!.github/workflows/render-cv.yml"
+      - "!.github/workflows/update-citations.yml"
+      - "!.github/workflows/update-music.yml"
+      - "!.github/workflows/update-publications.yml"
+      - "!docs/**"
       - "!README.md"
+      - "!AGENTS.md"
+      - "!CLAUDE.md"
   workflow_dispatch:
 
 permissions:
