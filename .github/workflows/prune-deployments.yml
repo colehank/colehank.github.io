@@ -1,0 +1,51 @@
+name: Prune deployments
+
+# Every deploy leaves a github-pages deployment record behind, and GitHub has
+# no retention setting for them. This trims the list back down on a schedule.
+# Records are metadata only — deleting them never touches the gh-pages branch
+# or the live site.
+
+on:
+  schedule:
+    - cron: "30 3 * * *" # daily, 03:30 UTC
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: "How many of the most recent deployments to keep"
+        required: false
+        default: "1"
+
+permissions:
+  deployments: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all but the newest deployments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          KEEP: ${{ inputs.keep || '1' }}
+        run: |
+          set -euo pipefail
+
+          ids=$(gh api "repos/$REPO/deployments?per_page=100" --paginate \
+                  --jq '.[] | "\(.created_at) \(.id)"' | sort -r | awk '{print $2}')
+          total=$(printf '%s\n' "$ids" | grep -c . || true)
+
+          echo "Found $total deployment(s); keeping the newest $KEEP."
+          if [ "$total" -le "$KEEP" ]; then
+            echo "Nothing to prune."
+            exit 0
+          fi
+
+          printf '%s\n' "$ids" | tail -n +"$((KEEP + 1))" | while read -r id; do
+            [ -n "$id" ] || continue
+            # GitHub refuses to delete an active deployment, so retire it first.
+            gh api -X POST "repos/$REPO/deployments/$id/statuses" -f state=inactive >/dev/null
+            gh api -X DELETE "repos/$REPO/deployments/$id" >/dev/null
+            echo "  deleted $id"
+          done
+
+          echo "Remaining: $(gh api "repos/$REPO/deployments?per_page=100" --paginate --jq '.[].id' | grep -c . || true)"

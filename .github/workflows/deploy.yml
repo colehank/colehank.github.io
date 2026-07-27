@@ -19,6 +19,7 @@ on:
       - "Gemfile.lock"
       # Docs and sibling workflows are excluded from the Jekyll build,
       # so changing them should not trigger a deploy.
+      - "!.github/workflows/prune-deployments.yml"
       - "!.github/workflows/render-cv.yml"
       - "!.github/workflows/update-citations.yml"
       - "!.github/workflows/update-music.yml"
@@ -45,6 +46,7 @@ on:
       - "Gemfile.lock"
       # Docs and sibling workflows are excluded from the Jekyll build,
       # so changing them should not trigger a deploy.
+      - "!.github/workflows/prune-deployments.yml"
       - "!.github/workflows/render-cv.yml"
       - "!.github/workflows/update-citations.yml"
       - "!.github/workflows/update-music.yml"
