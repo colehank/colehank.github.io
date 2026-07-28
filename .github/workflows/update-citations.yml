@@ -103,6 +103,15 @@ jobs:
       - name: Commit and push if changed
         id: commit
         run: |
+          # The fetch step is deliberately non-fatal (Google Scholar rate-limits
+          # CI runners), so the file may legitimately not exist here. `git add`
+          # on a missing path is a hard error, so check before staging.
+          if [ ! -f _data/citations.yml ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ _data/citations.yml was not produced — nothing to commit." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
           git add _data/citations.yml
           if git diff --staged --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"

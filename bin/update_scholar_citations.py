@@ -41,6 +41,11 @@ def get_scholar_citations() -> None:
     print(f"Fetching citations for Google Scholar ID: {SCHOLAR_USER_ID}")
     today = datetime.now().strftime("%Y-%m-%d")
 
+    # Must be bound before the comparison further down: on a fresh checkout the
+    # file does not exist yet, and the read below can also raise. Either way we
+    # would otherwise hit an UnboundLocalError instead of writing the file.
+    existing_data = None
+
     # Check if the output file was already updated today
     if os.path.exists(OUTPUT_FILE):
         try:
