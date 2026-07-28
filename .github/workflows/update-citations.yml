@@ -58,7 +58,9 @@ jobs:
           set +e
           echo "🚀 Running citation update script (single attempt)..."
           start_time=$(date)
-          timeout 90 python bin/update_scholar_citations.py
+          # scholarly is configured for a 15s timeout with 3 retries across two
+          # network calls, so 90s could be hit while still making progress.
+          timeout 300 python bin/update_scholar_citations.py
           status=$?
           end_time=$(date)
           if [ $status -eq 0 ]; then
