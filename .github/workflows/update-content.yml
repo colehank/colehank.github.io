@@ -1,0 +1,96 @@
+name: Update content
+
+# Pulls the site's external content sources and commits whatever moved, as one
+# commit and one redeploy instead of two.
+#
+# The two fetches are independent: each is continue-on-error, and only a source
+# that fetched cleanly gets staged, so a flaky upstream can neither block the
+# other source nor commit a half-written file.
+#
+# Both scripts are stdlib-only — there is nothing to pip install.
+#
+# Google Scholar is deliberately absent: it blocks datacenter IPs, so scholarly
+# hangs on a CAPTCHA page until the runner times out. Citation counts have to be
+# refreshed from a local machine; see README.
+
+on:
+  schedule:
+    - cron: "0 1 * * 1" # Mondays 01:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write # needed to trigger the deploy workflow after a change
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Fetch publications from OpenAlex
+        id: publications
+        continue-on-error: true
+        run: python scripts/update_publications.py
+
+      - name: Fetch music from NetEase
+        id: music
+        continue-on-error: true
+        run: python scripts/update_music.py
+
+      - name: Commit and push if changed
+        id: commit
+        run: |
+          set -euo pipefail
+
+          {
+            echo "| Source | Fetch |"
+            echo "| --- | --- |"
+            echo "| OpenAlex | ${{ steps.publications.outcome }} |"
+            echo "| NetEase | ${{ steps.music.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+          # Stage only the sources that fetched cleanly, so a failed run can
+          # never commit a truncated file over good data.
+          if [ "${{ steps.publications.outcome }}" = "success" ]; then
+            git add _bibliography/papers.bib assets/img/publication_preview
+          fi
+          if [ "${{ steps.music.outcome }}" = "success" ]; then
+            git add _data/music.yml
+          fi
+
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "ℹ️ Nothing changed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Name only what actually moved, so the history stays readable.
+          what=""
+          git diff --staged --quiet -- _bibliography/papers.bib assets/img/publication_preview \
+            || what="publications"
+          if ! git diff --staged --quiet -- _data/music.yml; then
+            if [ -n "$what" ]; then what="$what and music"; else what="music"; fi
+          fi
+
+          git commit -m "Update $what"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "✅ Updated $what." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Trigger site deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml

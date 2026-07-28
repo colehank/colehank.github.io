@@ -21,9 +21,7 @@ on:
       # so changing them should not trigger a deploy.
       - "!.github/workflows/prune-deployments.yml"
       - "!.github/workflows/render-cv.yml"
-      - "!.github/workflows/update-citations.yml"
-      - "!.github/workflows/update-music.yml"
-      - "!.github/workflows/update-publications.yml"
+      - "!.github/workflows/update-content.yml"
       - "!docs/**"
       - "!README.md"
       - "!AGENTS.md"
@@ -48,9 +46,7 @@ on:
       # so changing them should not trigger a deploy.
       - "!.github/workflows/prune-deployments.yml"
       - "!.github/workflows/render-cv.yml"
-      - "!.github/workflows/update-citations.yml"
-      - "!.github/workflows/update-music.yml"
-      - "!.github/workflows/update-publications.yml"
+      - "!.github/workflows/update-content.yml"
       - "!docs/**"
       - "!README.md"
       - "!AGENTS.md"

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Regenerate _data/music.yml from NetEase Cloud Music (artist + radio).
 
-Mirrors the pattern of scripts/update_publications.py / bin/update_scholar_citations.py:
-fetch public data, write a _data/*.yml file, let the workflow commit it only when
-it actually changed. Uses only NetEase's *public* GET endpoints (no login/cookie),
+Mirrors the pattern of scripts/update_publications.py: fetch public data, write a
+_data/*.yml file, let the workflow commit it only when it actually changed. Both
+are driven by .github/workflows/update-content.yml. Uses only NetEase's *public* GET endpoints (no login/cookie),
 so it can run unattended in CI. The live site build is separate — if a run fails,
 the last good _data/music.yml stays committed and the page never breaks.
 

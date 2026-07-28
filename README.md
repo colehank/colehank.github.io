@@ -46,39 +46,39 @@ npm run format              # fix
 
 ## Automation
 
-Two jobs pull content in from outside and commit the result; each triggers a
-redeploy only when something actually changed.
+| Workflow                | Trigger         | Does                                                 |
+| ----------------------- | --------------- | ---------------------------------------------------- |
+| `update-content.yml`    | Mon 01:00 UTC   | OpenAlex → `papers.bib`, NetEase → `_data/music.yml` |
+| `deploy.yml`            | push to `main`  | Jekyll build → purgecss → translate → `gh-pages`     |
+| `render-cv.yml`         | **manual only** | `_data/cv.yml` → CV PDF                              |
+| `prune-deployments.yml` | daily 03:30 UTC | trims old deployment records                         |
 
-| Workflow                  | Trigger                 | Fetches from | Writes                                           |
-| ------------------------- | ----------------------- | ------------ | ------------------------------------------------ |
-| `update-publications.yml` | Mon 01:00 UTC           | OpenAlex     | `_bibliography/papers.bib` + preview images      |
-| `update-music.yml`        | 1st of month, 02:00 UTC | NetEase      | `_data/music.yml`                                |
-| `deploy.yml`              | push to `main`          | —            | Jekyll build → purgecss → translate → `gh-pages` |
-| `render-cv.yml`           | **manual only**         | —            | `_data/cv.yml` → CV PDF                          |
-| `update-citations.yml`    | **manual only**         | —            | see below                                        |
-| `prune-deployments.yml`   | daily 03:30 UTC         | —            | trims old deployment records                     |
+`update-content.yml` handles both external sources in one run: it commits
+whatever moved as a single commit and triggers exactly one redeploy. The two
+fetches are independent — each is `continue-on-error`, and only a source that
+fetched cleanly gets staged, so a flaky upstream can neither block the other nor
+overwrite good data with a truncated file.
+
+`_bibliography/papers.bib` and `_data/music.yml` are workflow-owned — never
+hand-edit them, the next run overwrites whatever is there.
 
 `render-cv.yml` is deliberately manual: the PDF is normally rendered locally and
 committed together with the CV edit, which avoids a second commit-and-redeploy
 cycle. Run it from the Actions tab if you edit `_data/cv.yml` on GitHub directly.
 
-`_data/music.yml` is workflow-owned — never hand-edit it, the next run
-overwrites whatever is there.
+### Why there is no Google Scholar automation
 
-### Google Scholar citation counts
+Google Scholar blocks datacenter IPs, so `scholarly` running on a GitHub runner
+hangs on a CAPTCHA page until the job times out — reproduced at both 90s and
+300s, each consuming the full budget. The workflow that tried to do this failed
+on every run since the repo was created and has been removed, along with
+`_data/citations.yml` and the `google_scholar` publication badge.
 
-`update-citations.yml` is unscheduled because Google Scholar blocks datacenter
-IPs: on a GitHub runner `scholarly` hangs on a CAPTCHA page until the timeout
-kills it. Refresh the counts from your own machine instead:
-
-```bash
-python3 -m pip install --user --break-system-packages scholarly pyyaml
-python3 bin/update_scholar_citations.py
-git add _data/citations.yml && git commit -m "Update Google Scholar citations" && git push
-```
-
-If `_data/citations.yml` is absent the Scholar count just does not render; the
-Altmetric and Dimensions badges are client-side and unaffected.
+The Altmetric and Dimensions badges are client-side and still work, so
+publications keep their citation metrics. If you ever want Scholar counts back,
+the only reliable route is running the fetch from your own machine, where the IP
+is not blocked, and committing `_data/citations.yml` by hand — then flip
+`enable_publication_badges.google_scholar` back to `true`.
 
 ## License
 

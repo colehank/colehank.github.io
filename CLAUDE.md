@@ -118,26 +118,26 @@ purgecss → `scripts/translate_site.py` (gpt-4o, `continue-on-error`) →
 force-push to `gh-pages`. It also runs on pull requests (without deploying), so
 **opening a PR is the cheapest way to verify a real build.**
 
-Scheduled content jobs: `update-publications.yml` (Mon, OpenAlex →
-`_bibliography/papers.bib`) and `update-music.yml` (monthly, NetEase →
-`_data/music.yml`). Both commit and then chain a deploy only when something
-changed. `prune-deployments.yml` trims deployment records daily.
+`update-content.yml` (Mondays 01:00 UTC) is the single content-refresh job: it
+runs `scripts/update_publications.py` (OpenAlex → `_bibliography/papers.bib` +
+preview images) and `scripts/update_music.py` (NetEase → `_data/music.yml`),
+commits whatever moved as **one** commit, and chains **one** deploy. Both
+fetches are `continue-on-error` and only a cleanly-fetched source is staged, so
+one flaky upstream cannot block the other or commit a truncated file. Both
+scripts are stdlib-only. These two files are tool-owned — never hand-edit them.
 
-Manual-only: `render-cv.yml` (`_data/cv.yml` → PDF) and `update-citations.yml`.
-The latter is unscheduled because **Google Scholar blocks datacenter IPs** —
-`scholarly` hangs on a CAPTCHA page until the timeout kills it (exit 124,
-reproduced at both 90s and 300s), and dispatching by hand runs on the same
-runners. Refresh citations locally instead:
+`prune-deployments.yml` trims deployment records daily. `render-cv.yml`
+(`_data/cv.yml` → PDF) is manual-only.
 
-```bash
-python3 -m pip install --user --break-system-packages scholarly pyyaml
-python3 bin/update_scholar_citations.py   # writes _data/citations.yml
-```
-
-`_data/citations.yml` may legitimately be absent; the Scholar count then does
-not render, while the client-side Altmetric and Dimensions badges are
-unaffected. The generated files (`papers.bib`, `music.yml`, `citations.yml`)
-are tool-owned — never hand-edit them.
+**Do not add Google Scholar automation back.** It was tried and removed:
+Scholar blocks datacenter IPs, so `scholarly` hangs on a CAPTCHA page until the
+runner kills it (exit 124, reproduced at both 90s and 300s, each burning the
+full budget), and `workflow_dispatch` runs on the same IP ranges. The workflow
+had failed on every run since the repo was created. `_data/citations.yml`, the
+fetch script, and the `google_scholar` badge are all gone; `inspirehep` is off
+too, since it only indexes high-energy physics. Altmetric and Dimensions are
+client-side and unaffected. Reinstating any of this needs either a paid scraping
+proxy or a human running the fetch locally and committing the result.
 
 ## Formatting
 

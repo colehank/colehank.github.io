@@ -1,5 +1,7 @@
-nbconvert
-pyyaml
-rendercv[full]==2.8
-scholarly
-beautifulsoup4
+# Installed by render-cv.yml. deploy.yml installs what it needs inline.
+rendercv[full]==2.8   # render-cv.yml: _data/cv.yml -> CV PDF
+nbconvert             # jekyll-jupyter-notebook, if a post ever embeds a notebook
+beautifulsoup4        # scripts/translate_site.py
+pyyaml                # rendercv / general YAML handling
+
+# scripts/update_publications.py and scripts/update_music.py are stdlib-only.
