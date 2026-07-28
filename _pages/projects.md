@@ -67,3 +67,23 @@ horizontal: true
   {% endif %}
 {% endif %}
 </div>
+
+<!-- Page-local: site-wide chrome lives in `footer_text` in _config.yml.
+     PurgeCSS only processes assets/css/*.css, so an inline block is safe. -->
+<style>
+/* The theme sets .card-title to 2rem, which is heavier than the page heading
+   above it and reads as though each repo were its own page title. */
+.projects .card-title { font-size: 1.3rem; font-weight: 500; margin-bottom: .4rem; }
+.projects .card-text { font-size: .9rem; line-height: 1.55; }
+.projects .card-body { padding: 1.35rem 1.5rem; }
+
+/* Cards are equal height, but the repo link sat immediately after the
+   description — so with descriptions of different lengths the icons landed at
+   different heights across a row. Make the body a column and push the link row
+   to the bottom edge so they line up. */
+.projects .card > .row { flex: 1 1 auto; }
+.projects .card > .row > [class*="col-"] { display: flex; flex-direction: column; }
+.projects .card-body { display: flex; flex-direction: column; }
+.projects .card-body > .row:last-child { margin-top: auto; margin-bottom: 0; }
+.projects .github-icon .icon a { font-size: 1.1rem; line-height: 1; }
+</style>
