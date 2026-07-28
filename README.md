@@ -46,13 +46,24 @@ npm run format              # fix
 
 ## Automation
 
-| Workflow                  | Trigger                | Does                                             |
-| ------------------------- | ---------------------- | ------------------------------------------------ |
-| `deploy.yml`              | push to `main`         | Jekyll build → purgecss → translate → `gh-pages` |
-| `render-cv.yml`           | `_data/cv.yml` changes | RenderCV → `assets/rendercv/rendercv_output/`    |
-| `update-citations.yml`    | Mon/Wed/Fri            | Google Scholar counts → `_data/citations.yml`    |
-| `update-publications.yml` | schedule               | refresh `_bibliography/papers.bib`               |
-| `update-music.yml`        | schedule               | refresh `_data/music.yml` from NetEase           |
+Three jobs pull content in from outside and commit the result; each triggers a
+redeploy only when something actually changed.
+
+| Workflow                  | Trigger                 | Fetches from   | Writes                                           |
+| ------------------------- | ----------------------- | -------------- | ------------------------------------------------ |
+| `update-publications.yml` | Mon 01:00 UTC           | OpenAlex       | `_bibliography/papers.bib` + preview images      |
+| `update-citations.yml`    | Mon/Wed/Fri 00:00 UTC   | Google Scholar | `_data/citations.yml` (badge counts)             |
+| `update-music.yml`        | 1st of month, 02:00 UTC | NetEase        | `_data/music.yml`                                |
+| `deploy.yml`              | push to `main`          | —              | Jekyll build → purgecss → translate → `gh-pages` |
+| `render-cv.yml`           | **manual only**         | —              | `_data/cv.yml` → CV PDF                          |
+| `prune-deployments.yml`   | daily 03:30 UTC         | —              | trims old deployment records                     |
+
+`render-cv.yml` is deliberately manual: the PDF is normally rendered locally and
+committed together with the CV edit, which avoids a second commit-and-redeploy
+cycle. Run it from the Actions tab if you edit `_data/cv.yml` on GitHub directly.
+
+`_data/citations.yml` and `_data/music.yml` are workflow-owned — never hand-edit
+them, the next run overwrites whatever is there.
 
 ## License
 
