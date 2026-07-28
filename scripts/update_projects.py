@@ -29,8 +29,10 @@ import urllib.request
 
 SOCIALS_FILE = "_data/socials.yml"
 OUTPUT_DIR = "_projects"
+IMAGE_DIR = "assets/img/projects"
 GRAPHQL_URL = "https://api.github.com/graphql"
 MAX_DESCRIPTION = 260
+MAX_IMAGE_BYTES = 2_000_000
 
 QUERY = """
 query($login: String!) {
@@ -41,6 +43,8 @@ query($login: String!) {
           name
           description
           url
+          openGraphImageUrl
+          usesCustomOpenGraphImage
           object(expression: "HEAD:README.md") { ... on Blob { text } }
         }
       }
@@ -133,7 +137,47 @@ def yaml_quote(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def render(repo: dict, importance: int) -> str:
+def fetch_thumbnail(repo: dict, slug: str) -> str | None:
+    """Download the repo's *custom* social-preview image, if it has one.
+
+    Deliberately ignores GitHub's auto-generated OpenGraph card: that is a white
+    banner repeating the repo name and description, which reads badly next to a
+    card already showing both. README figures are no better — they are wide
+    diagrams whose detail is illegible at thumbnail size.
+
+    So a card only gets an image when a human chose one, via
+    Settings -> Social preview on the repository. Same bar as the publication
+    previews in papers.bib.
+    """
+    if not repo.get("usesCustomOpenGraphImage"):
+        return None
+
+    url = repo.get("openGraphImageUrl")
+    if not url:
+        return None
+
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "site-updater"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            content_type = resp.headers.get("Content-Type", "")
+            data = resp.read(MAX_IMAGE_BYTES + 1)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+        print(f"    ! could not fetch social preview: {e}")
+        return None
+
+    if len(data) > MAX_IMAGE_BYTES:
+        print(f"    ! social preview larger than {MAX_IMAGE_BYTES // 1000}kB, skipping")
+        return None
+
+    ext = "jpg" if "jpeg" in content_type else "png"
+    os.makedirs(IMAGE_DIR, exist_ok=True)
+    path = os.path.join(IMAGE_DIR, f"{slug}.{ext}")
+    with open(path, "wb") as f:
+        f.write(data)
+    return path
+
+
+def render(repo: dict, importance: int, image: str | None) -> str:
     description = (repo.get("description") or "").strip()
     if not description:
         blob = repo.get("object") or {}
@@ -150,7 +194,8 @@ def render(repo: dict, importance: int) -> str:
         f"title: {yaml_quote(repo['name'])}\n"
         f"description: {yaml_quote(description)}\n"
         f"importance: {importance}\n"
-        f"github: {repo['url']}\n"
+        + (f"img: {image}\n" if image else "")
+        + f"github: {repo['url']}\n"
         f"redirect: {repo['url']}\n"
         "---\n"
     )
@@ -186,12 +231,26 @@ def main() -> None:
             if re.search(r"^generated:\s*true\s*$", f.read(), re.M):
                 os.remove(path)
 
+    kept_images = set()
     for index, repo in enumerate(repos, start=1):
-        path = os.path.join(OUTPUT_DIR, f"{index}_{slugify(repo['name'])}.md")
+        slug = slugify(repo["name"])
+        path = os.path.join(OUTPUT_DIR, f"{index}_{slug}.md")
+        image = fetch_thumbnail(repo, slug)
+        if image:
+            kept_images.add(os.path.basename(image))
         with open(path, "w", encoding="utf-8") as f:
-            f.write(render(repo, index))
+            f.write(render(repo, index, image))
         source = "description" if (repo.get("description") or "").strip() else "README"
-        print(f"  {repo['name']:<14} -> {path}  (description from {source})")
+        thumb = os.path.basename(image) if image else "no social preview set"
+        print(f"  {repo['name']:<14} -> {path}\n{'':<18}description from {source}; thumbnail: {thumb}")
+
+    # Drop thumbnails for repos that were unpinned or had their preview removed.
+    if os.path.isdir(IMAGE_DIR):
+        for name in os.listdir(IMAGE_DIR):
+            if name not in kept_images:
+                os.remove(os.path.join(IMAGE_DIR, name))
+        if not os.listdir(IMAGE_DIR):
+            os.rmdir(IMAGE_DIR)
 
     print(f"Wrote {len(repos)} project card(s) to {OUTPUT_DIR}/")
 

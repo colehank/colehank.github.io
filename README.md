@@ -44,11 +44,29 @@ token. To run it locally:
 GITHUB_TOKEN=$(gh auth token) python3 scripts/update_projects.py
 ```
 
-Notes on the card template: `collections.projects.output` is `false`, so no
-per-project pages are generated — with `redirect:` set they would be empty
-orphans in the sitemap. The page renders one flat list, because GitHub exposes
-nothing to derive a category from. And do **not** use `github_stars:` — no
-shipped JS fills it in, so it renders a star icon with no number.
+#### Card thumbnails
+
+A card gets a thumbnail — beside the text, like the publication previews — when
+the repository has a **custom social preview** image set on GitHub
+(_repo → Settings → Social preview_, 1280×640). The script downloads it into
+`assets/img/projects/` and wires it up automatically; repos without one render
+as text-only cards.
+
+Nothing else is used as a thumbnail on purpose. GitHub's auto-generated
+OpenGraph card is a white banner repeating the repo name and description the
+card already shows, and README figures are wide diagrams that turn into an
+illegible smear at thumbnail size (one is also 3 MB). Both were tried and
+looked worse than no image.
+
+#### Other notes
+
+`collections.projects.output` is `false`, so no per-project pages are generated —
+with `redirect:` set they would be empty orphans in the sitemap. The page renders
+one flat list, because GitHub exposes nothing to derive a category from.
+`horizontal: true` in `_pages/projects.md` gives a 2-wide grid; at 3-wide a
+fourth pinned repo is stranded alone on its own row. And do **not** use
+`github_stars:` — no shipped JS fills it in, so it renders a star icon with no
+number.
 
 Site-wide CSS overrides live in one place: the `footer_text` block in
 `_config.yml`, which renders on every page. Page-specific rules stay in the
