@@ -13,7 +13,7 @@ Built on [al-folio](https://github.com/alshedivat/al-folio) v1.x (Jekyll + the `
 | Bio / landing page | `_pages/about.md`                                                            |
 | Publications       | `_bibliography/papers.bib` (+ previews in `assets/img/publication_preview/`) |
 | News items         | `_news/`                                                                     |
-| Projects           | `_projects/` — one file per repo, see below                                  |
+| Projects           | your **pinned repos on GitHub** — auto-generated, see below                  |
 | CV                 | `_data/cv.yml` (RenderCV) → PDF rebuilt by the CV workflow                   |
 | Music page         | `_data/music.yml` (auto-generated — don't hand-edit)                         |
 | Site config        | `_config.yml`                                                                |
@@ -23,27 +23,32 @@ navbar (`nav: false`) until there is something to show.
 
 ### Projects
 
-`/projects/` shows one card per repo, grouped by the `category:` in each file's
-front matter (currently `datasets` and `tools`, listed in `display_categories`
-in `_pages/projects.md`). To add one, drop a file in `_projects/`:
+`/projects/` is **generated, not hand-written**. `scripts/update_projects.py`
+reads the repositories pinned on the GitHub profile and rewrites `_projects/`,
+one card per repo, in pin order. It runs weekly as part of `update-content.yml`.
 
-```yaml
----
-layout: page
-title: repo-name
-description: One or two sentences.
-importance: 1 # sort order within the category
-category: tools
-github: https://github.com/colehank/repo-name
-redirect: https://github.com/colehank/repo-name # card links straight to GitHub
----
+**To change what appears, change your pins on GitHub** — the site follows on the
+next run (or trigger `update-content.yml` manually). Card text comes from the
+repo's GitHub **description**; if that is empty, the script falls back to the
+first real line of the README. So the best way to fix a card's wording is to set
+the repo description on GitHub.
+
+Every generated file carries `generated: true`. The script deletes only those, so
+a hand-written card dropped into `_projects/` without that marker survives and
+appears alongside the pinned ones.
+
+Pinned repos are only exposed through GitHub's GraphQL API, which always needs a
+token. To run it locally:
+
+```bash
+GITHUB_TOKEN=$(gh auth token) python3 scripts/update_projects.py
 ```
 
-`collections.projects.output` is `false`, so no per-project pages are generated —
-with `redirect:` set they would be empty orphans in the sitemap. Set it back to
-`true` if a project ever gets a real write-up. Adding `img:` puts a thumbnail on
-the card. Do **not** use `github_stars:` — no shipped JS fills it in, so it
-renders a star icon with no number.
+Notes on the card template: `collections.projects.output` is `false`, so no
+per-project pages are generated — with `redirect:` set they would be empty
+orphans in the sitemap. The page renders one flat list, because GitHub exposes
+nothing to derive a category from. And do **not** use `github_stars:` — no
+shipped JS fills it in, so it renders a star icon with no number.
 
 Site-wide CSS overrides live in one place: the `footer_text` block in
 `_config.yml`, which renders on every page. Page-specific rules stay in the
@@ -86,21 +91,22 @@ npm run format              # fix
 
 ## Automation
 
-| Workflow                | Trigger         | Does                                                 |
-| ----------------------- | --------------- | ---------------------------------------------------- |
-| `update-content.yml`    | Mon 01:00 UTC   | OpenAlex → `papers.bib`, NetEase → `_data/music.yml` |
-| `deploy.yml`            | push to `main`  | Jekyll build → purgecss → translate → `gh-pages`     |
-| `render-cv.yml`         | **manual only** | `_data/cv.yml` → CV PDF                              |
-| `prune-deployments.yml` | daily 03:30 UTC | trims old deployment records                         |
+| Workflow                | Trigger         | Does                                                                             |
+| ----------------------- | --------------- | -------------------------------------------------------------------------------- |
+| `update-content.yml`    | Mon 01:00 UTC   | OpenAlex → `papers.bib`, NetEase → `_data/music.yml`, GitHub pins → `_projects/` |
+| `deploy.yml`            | push to `main`  | Jekyll build → purgecss → translate → `gh-pages`                                 |
+| `render-cv.yml`         | **manual only** | `_data/cv.yml` → CV PDF                                                          |
+| `prune-deployments.yml` | daily 03:30 UTC | trims old deployment records                                                     |
 
-`update-content.yml` handles both external sources in one run: it commits
-whatever moved as a single commit and triggers exactly one redeploy. The two
-fetches are independent — each is `continue-on-error`, and only a source that
-fetched cleanly gets staged, so a flaky upstream can neither block the other nor
+`update-content.yml` handles all three external sources in one run: it commits
+whatever moved as a single commit and triggers exactly one redeploy. The fetches
+are independent — each is `continue-on-error`, and only a source that fetched
+cleanly gets staged, so a flaky upstream can neither block the others nor
 overwrite good data with a truncated file.
 
-`_bibliography/papers.bib` and `_data/music.yml` are workflow-owned — never
-hand-edit them, the next run overwrites whatever is there.
+`_bibliography/papers.bib`, `_data/music.yml` and the generated files in
+`_projects/` are workflow-owned — never hand-edit them, the next run overwrites
+whatever is there.
 
 `render-cv.yml` is deliberately manual: the PDF is normally rendered locally and
 committed together with the CV edit, which avoids a second commit-and-redeploy

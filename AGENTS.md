@@ -26,8 +26,10 @@ gem, or as a deliberate local override (see `CLAUDE.md`).
   `_config.yml`, which renders on every page. It is a YAML folded scalar, so
   every CSS rule must stay on a single line. Page-specific rules stay inline in
   that page. Do not copy the same rule into multiple pages.
-- `_bibliography/papers.bib` and `_data/music.yml` are generated weekly by
-  `update-content.yml` — never hand-edit them.
+- `_bibliography/papers.bib`, `_data/music.yml`, and every `_projects/` file
+  marked `generated: true` are produced weekly by `update-content.yml` — never
+  hand-edit them. Project cards follow the pinned repos on GitHub; change the
+  pins, or the repo's GitHub description, not the files.
 - There is no Google Scholar automation: it blocks CI runners. Do not add one
   back without a proxy, and do not reintroduce `_data/citations.yml` or the
   `google_scholar` badge without a source that maintains the file.

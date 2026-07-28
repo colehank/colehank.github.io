@@ -142,11 +142,18 @@ force-push to `gh-pages`. It also runs on pull requests (without deploying), so
 
 `update-content.yml` (Mondays 01:00 UTC) is the single content-refresh job: it
 runs `scripts/update_publications.py` (OpenAlex → `_bibliography/papers.bib` +
-preview images) and `scripts/update_music.py` (NetEase → `_data/music.yml`),
+preview images), `scripts/update_music.py` (NetEase → `_data/music.yml`) and
+`scripts/update_projects.py` (pinned GitHub repos → `_projects/`),
 commits whatever moved as **one** commit, and chains **one** deploy. Both
 fetches are `continue-on-error` and only a cleanly-fetched source is staged, so
-one flaky upstream cannot block the other or commit a truncated file. Both
-scripts are stdlib-only. These two files are tool-owned — never hand-edit them.
+one flaky upstream cannot block the others or commit a truncated file. All three
+scripts are stdlib-only. Their outputs are tool-owned — never hand-edit them.
+
+`update_projects.py` needs `GITHUB_TOKEN` (pinned repos are GraphQL-only, unlike
+the REST endpoints the other two use); the workflow's built-in token suffices. It
+rewrites only files carrying `generated: true`, so a hand-written project card
+survives. Descriptions come from the repo's GitHub description, falling back to
+the first prose line of its README.
 
 `prune-deployments.yml` trims deployment records daily. `render-cv.yml`
 (`_data/cv.yml` → PDF) is manual-only.

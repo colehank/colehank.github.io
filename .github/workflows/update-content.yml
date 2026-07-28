@@ -44,6 +44,15 @@ jobs:
         continue-on-error: true
         run: python scripts/update_music.py
 
+      # Pinned repos are GraphQL-only, which always needs a token — the other
+      # two sources use unauthenticated REST. GITHUB_TOKEN reads public data.
+      - name: Fetch pinned repos from GitHub
+        id: projects
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/update_projects.py
+
       - name: Commit and push if changed
         id: commit
         run: |
@@ -54,6 +63,7 @@ jobs:
             echo "| --- | --- |"
             echo "| OpenAlex | ${{ steps.publications.outcome }} |"
             echo "| NetEase | ${{ steps.music.outcome }} |"
+            echo "| GitHub pins | ${{ steps.projects.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
           git config --local user.email "actions@github.com"
@@ -67,6 +77,9 @@ jobs:
           if [ "${{ steps.music.outcome }}" = "success" ]; then
             git add _data/music.yml
           fi
+          if [ "${{ steps.projects.outcome }}" = "success" ]; then
+            git add _projects   # also stages removals, so unpinned repos drop off
+          fi
 
           if git diff --staged --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -77,11 +90,11 @@ jobs:
 
           # Name only what actually moved, so the history stays readable.
           what=""
+          note() { if [ -n "$what" ]; then what="$what, $1"; else what="$1"; fi; }
           git diff --staged --quiet -- _bibliography/papers.bib assets/img/publication_preview \
-            || what="publications"
-          if ! git diff --staged --quiet -- _data/music.yml; then
-            if [ -n "$what" ]; then what="$what and music"; else what="music"; fi
-          fi
+            || note publications
+          git diff --staged --quiet -- _data/music.yml || note music
+          git diff --staged --quiet -- _projects || note projects
 
           git commit -m "Update $what"
           git push
