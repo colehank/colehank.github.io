@@ -97,6 +97,12 @@ jobs:
         run: |
           npm install -g purgecss
           purgecss -c purgecss.config.js
+
+      # PurgeCSS rewrote the stylesheets after Jekyll stamped their `?v=` cache
+      # tokens, so the tokens now point at content that no longer exists. Must
+      # run before the translation step copies the HTML into /zh/.
+      - name: Re-hash purged stylesheets 🔁
+        run: python3 scripts/rehash_purged_css.py _site
       - name: Restore translation cache 🗂️
         uses: actions/cache@v4
         with:
