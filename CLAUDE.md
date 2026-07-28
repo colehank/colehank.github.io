@@ -118,11 +118,26 @@ purgecss → `scripts/translate_site.py` (gpt-4o, `continue-on-error`) →
 force-push to `gh-pages`. It also runs on pull requests (without deploying), so
 **opening a PR is the cheapest way to verify a real build.**
 
-Other workflows: `render-cv.yml` (`_data/cv.yml` → PDF), `update-citations.yml`
-(Mon/Wed/Fri, writes `_data/citations.yml` — file may be absent, the script
-handles that), `update-publications.yml`, `update-music.yml` (writes
-`_data/music.yml`). All three generated files are workflow-owned; never
-hand-edit them.
+Scheduled content jobs: `update-publications.yml` (Mon, OpenAlex →
+`_bibliography/papers.bib`) and `update-music.yml` (monthly, NetEase →
+`_data/music.yml`). Both commit and then chain a deploy only when something
+changed. `prune-deployments.yml` trims deployment records daily.
+
+Manual-only: `render-cv.yml` (`_data/cv.yml` → PDF) and `update-citations.yml`.
+The latter is unscheduled because **Google Scholar blocks datacenter IPs** —
+`scholarly` hangs on a CAPTCHA page until the timeout kills it (exit 124,
+reproduced at both 90s and 300s), and dispatching by hand runs on the same
+runners. Refresh citations locally instead:
+
+```bash
+python3 -m pip install --user --break-system-packages scholarly pyyaml
+python3 bin/update_scholar_citations.py   # writes _data/citations.yml
+```
+
+`_data/citations.yml` may legitimately be absent; the Scholar count then does
+not render, while the client-side Altmetric and Dimensions badges are
+unaffected. The generated files (`papers.bib`, `music.yml`, `citations.yml`)
+are tool-owned — never hand-edit them.
 
 ## Formatting
 

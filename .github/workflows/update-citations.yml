@@ -2,12 +2,25 @@ name: Update Google Scholar Citations
 
 # Refreshes the citation counts behind the publication badges. Complements
 # update-publications.yml, which refreshes the list of papers itself.
+#
+# NOT SCHEDULED, on purpose. Google Scholar blocks datacenter IPs, so on a
+# GitHub runner `scholarly` hangs on a CAPTCHA page until the timeout kills it
+# (exit 124) — verified at both 90s and 300s. It used to run three times a week
+# and fail every time. Dispatching it by hand runs on the same runners and will
+# fail the same way; it is kept only for the day that changes, or for a runner
+# with a proxy configured.
+#
+# The path that actually works is running it locally, where your own IP is not
+# blocked:
+#
+#     python3 -m pip install --user --break-system-packages scholarly pyyaml
+#     python3 bin/update_scholar_citations.py
+#     git add _data/citations.yml && git commit -m "Update Google Scholar citations" && git push
+#
+# Without _data/citations.yml the Scholar count simply does not render. The
+# Altmetric and Dimensions badges are client-side and are unaffected.
 
 on:
-  schedule:
-    - cron: "0 0 * * 1" # Monday
-    - cron: "0 0 * * 3" # Wednesday
-    - cron: "0 0 * * 5" # Friday
   workflow_dispatch:
 
 # Without this the repo default (read) applies and the `git push` below fails
