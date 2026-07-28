@@ -39,15 +39,21 @@ gem, or as a deliberate local override (see `CLAUDE.md`).
 ## Commands
 
 ```bash
-docker compose up -d && open http://127.0.0.1:8080/   # local preview (no Ruby needed)
-docker compose logs -f
-docker compose down
+export PATH="/opt/homebrew/opt/ruby@3.3/bin:/opt/homebrew/lib/ruby/gems/3.3.0/bin:$PATH"
+bundle install
+JEKYLL_ENV=production bundle exec jekyll build      # -> _site/
+bundle exec jekyll serve                            # http://127.0.0.1:4000/
 
 npm ci
-npm run lint:prettier     # formatting check (matches nothing in CI — run it locally)
+npm run lint:prettier     # formatting check (no CI runs it — run it locally)
 npm run format            # apply
 ```
 
-There is no local Ruby toolchain on this machine; the authoritative build is
-`deploy.yml` on GitHub Actions, which also runs on pull requests. Prefer opening
-a PR to verify a build before merging to `main`.
+Building locally takes a couple of seconds — do it before pushing any change to
+`_config.yml`, the `Gemfile`, or a layout/include. Plugin and Liquid errors are
+hard build failures that no YAML check will catch. `deploy.yml` on GitHub
+Actions remains the authoritative build and also runs on pull requests.
+
+Never disable a feature by removing its gem — drop the config flag instead. A
+missing gem leaves its Liquid tag undefined and `al_folio_core` calls those tags
+unconditionally, so the build dies outright. See `CLAUDE.md`.

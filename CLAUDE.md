@@ -61,8 +61,17 @@ Architectural facts:
   `enable_math`, `enable_cookie_consent`, `enable_darkmode`,
   `al_folio.features.cv.enabled`, `al_folio.features.distill.enabled`) _and_
   per-page front matter (`images:`, `tikzjax`, `chart.*`, `mermaid.*`,
-  `giscus_comments`, `layout: distill|cv`). A tag emits an empty string when its
-  gem/flag is absent — **features fail silently, not loudly.**
+  `giscus_comments`, `layout: distill|cv`). Turning a **flag** off makes the tag
+  emit an empty string — features fail silently, not loudly.
+- **Removing a gem is not the same as turning its flag off.** A flag-disabled
+  feature no-ops; a _missing_ gem means its Liquid tag is undefined, and
+  `al_folio_core`'s includes call those tags unconditionally, so the build dies
+  with `Liquid syntax error: Unknown tag`. Verified by removing `al_citations`
+  while both `enable_publication_badges.google_scholar` and `inspirehep` were
+  already `false`: the site still failed to build on `inspirehep_citations`.
+  **`al_citations` must stay in the `Gemfile` and `plugins:` list even though it
+  currently renders nothing.** Disable features via config flags, not by
+  dropping gems.
 - **Most feature gems are `AssetsGenerator`s** that inject JS/CSS as Jekyll
   static files at build time only when enabled. Several use pinned-CDN URLs +
   SRI hashes from `_config.yml`'s `third_party_libraries:` block.
@@ -96,17 +105,30 @@ them here silently takes over ownership of a file that upstream keeps updating.
 
 ## Build and deploy
 
-There is **no local Ruby toolchain on this machine** (system Ruby is 2.6; the
-`Gemfile.lock` wants bundler 4.0.6). Two ways to build:
+**Building locally works and is fast (~1–3s).** The system Ruby (2.6) is far too
+old and Docker is not installed, so use the Homebrew Ruby that matches CI:
 
 ```bash
-docker compose up -d                    # bind-mounts repo, serves on :8080
-curl -fsS http://127.0.0.1:8080/ >/dev/null
-docker compose logs --tail=80
-docker compose down
+export PATH="/opt/homebrew/opt/ruby@3.3/bin:/opt/homebrew/lib/ruby/gems/3.3.0/bin:$PATH"
+bundle install                       # into vendor/bundle (gitignored)
+JEKYLL_ENV=production bundle exec jekyll build   # -> _site/
 ```
 
-`docker compose` runs `bin/entry_point.sh`, which serves with
+First-time setup was `brew install ruby@3.3` plus
+`gem install bundler -v 4.0.6` (the version `Gemfile.lock` pins) and
+`bundle config set --local path vendor/bundle`. `baseurl` is `""`, so no
+`--baseurl` flag is needed. ImageMagick is present, so responsive-image
+generation runs like it does in CI.
+
+**Use this before pushing anything that touches `_config.yml`, the `Gemfile`, or
+a layout/include** — a Liquid or plugin error is a hard build failure that
+static YAML checks cannot catch. To prove a change is inert, snapshot `_site`,
+rebuild, and diff: everything should match except the `<updated>` timestamp in
+`feed.xml`.
+
+Docker is also wired up (`docker compose up -d`, serving on :8080) but is **not
+installed on this machine**. If you do use it, note that it runs
+`bin/entry_point.sh`, which serves with
 `--force_polling --destination /tmp/_site`. Build output deliberately goes to
 **container-local `/tmp/_site`, not the bind-mounted `_site`** — writing `_site`
 back across the host bind mount caused write deadlocks. The container also

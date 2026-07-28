@@ -27,14 +27,30 @@ page itself.
 
 ## Local preview
 
-No Ruby toolchain is needed — use Docker:
+The system Ruby on macOS is too old, so use the Homebrew Ruby that matches CI.
+One-time setup:
 
 ```bash
-docker compose up -d
-open http://127.0.0.1:8080/
-docker compose logs -f      # watch the rebuild
-docker compose down
+brew install ruby@3.3
+export PATH="/opt/homebrew/opt/ruby@3.3/bin:/opt/homebrew/lib/ruby/gems/3.3.0/bin:$PATH"
+gem install bundler -v 4.0.6          # the version Gemfile.lock pins
+bundle config set --local path vendor/bundle
+bundle install
 ```
+
+Then, with that `PATH` exported:
+
+```bash
+bundle exec jekyll serve                          # http://127.0.0.1:4000/
+JEKYLL_ENV=production bundle exec jekyll build    # one-shot, into _site/
+```
+
+A build takes a couple of seconds. Run one before pushing changes to
+`_config.yml`, the `Gemfile`, or any layout — plugin and Liquid errors break the
+build outright and nothing else catches them.
+
+A Docker setup (`docker compose up -d`, port 8080) is also committed if you
+prefer it, but Docker is not currently installed on this machine.
 
 Formatting (the only lint kept in this repo):
 
