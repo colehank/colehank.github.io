@@ -13,13 +13,37 @@ Built on [al-folio](https://github.com/alshedivat/al-folio) v1.x (Jekyll + the `
 | Bio / landing page | `_pages/about.md`                                                            |
 | Publications       | `_bibliography/papers.bib` (+ previews in `assets/img/publication_preview/`) |
 | News items         | `_news/`                                                                     |
+| Projects           | `_projects/` — one file per repo, see below                                  |
 | CV                 | `_data/cv.yml` (RenderCV) → PDF rebuilt by the CV workflow                   |
 | Music page         | `_data/music.yml` (auto-generated — don't hand-edit)                         |
 | Site config        | `_config.yml`                                                                |
 
-Blog posts go in `_posts/`, projects in `_projects/`. Both are currently empty;
-their pages (`/blog/`, `/projects/`) exist and are hidden from the navbar
-(`nav: false`) until there is something to show.
+Blog posts go in `_posts/`, which is still empty, so `/blog/` is hidden from the
+navbar (`nav: false`) until there is something to show.
+
+### Projects
+
+`/projects/` shows one card per repo, grouped by the `category:` in each file's
+front matter (currently `datasets` and `tools`, listed in `display_categories`
+in `_pages/projects.md`). To add one, drop a file in `_projects/`:
+
+```yaml
+---
+layout: page
+title: repo-name
+description: One or two sentences.
+importance: 1 # sort order within the category
+category: tools
+github: https://github.com/colehank/repo-name
+redirect: https://github.com/colehank/repo-name # card links straight to GitHub
+---
+```
+
+`collections.projects.output` is `false`, so no per-project pages are generated —
+with `redirect:` set they would be empty orphans in the sitemap. Set it back to
+`true` if a project ever gets a real write-up. Adding `img:` puts a thumbnail on
+the card. Do **not** use `github_stars:` — no shipped JS fills it in, so it
+renders a star icon with no number.
 
 Site-wide CSS overrides live in one place: the `footer_text` block in
 `_config.yml`, which renders on every page. Page-specific rules stay in the

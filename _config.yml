@@ -193,7 +193,10 @@ collections:
       layout: post
     output: true
   projects:
-    output: true
+    # No detail pages: every project card sets `redirect:` and links straight to
+    # its GitHub repo, so generated pages would be empty orphans in the sitemap.
+    # Flip to true if a project ever gets a real write-up of its own.
+    output: false
 
 # -----------------------------------------------------------------------------
 # Jekyll settings

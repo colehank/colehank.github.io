@@ -9,7 +9,7 @@ architecture and `docs/` for the al-folio manual.
 Content and wiring only:
 
 - `_pages/`, `_news/`, `_posts/`, `_projects/`, `_bibliography/papers.bib`
-- `_data/` (cv, socials, coauthors, venues, music, repositories)
+- `_data/` (cv, socials, coauthors, venues, music)
 - `_config.yml`, `Gemfile` (plugin list + version pins — keep the two in sync)
 - `assets/` (avatar, favicon, publication previews, RenderCV inputs)
 - `.github/workflows/` (deploy + the scheduled content refreshers)

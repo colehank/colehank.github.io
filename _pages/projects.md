@@ -2,10 +2,10 @@
 layout: page
 title: projects
 permalink: /projects/
-description: A growing collection of your cool projects.
-nav: false
+description: Open-source code from my research — dataset pipelines and reusable toolkits.
+nav: true
 nav_order: 3
-display_categories: [work, fun]
+display_categories: [datasets, tools]
 horizontal: false
 ---
 
