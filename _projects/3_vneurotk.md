@@ -5,7 +5,7 @@
 generated: true
 layout: page
 title: "VneuroTK"
-description: "A python toolkit for visual neuroscience"
+description: "A Python toolkit for visual neuroscience."
 importance: 3
 github: https://github.com/colehank/VneuroTK
 redirect: https://github.com/colehank/VneuroTK
