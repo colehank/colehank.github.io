@@ -5,7 +5,7 @@
 generated: true
 layout: page
 title: "meeg-utils"
-description: "A Python-based MEG/EEG processing toolkit built on MNE-Python, providing a high-level, user-friendly API for processing MEG/EEG data."
+description: "MEG/EEG quality control, preprocessing and epoching on top of"
 importance: 4
 github: https://github.com/colehank/meeg-utils
 redirect: https://github.com/colehank/meeg-utils
